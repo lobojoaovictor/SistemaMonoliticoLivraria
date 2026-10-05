@@ -549,43 +549,43 @@ namespace SistemaMonoliticoLivraria
         ///                                             CAMADA DE PERSISTÊNCIA                                            ///
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        static void CarregarDados(List<Venda> listaDeVendas, List<Filme> listaDeFilmes, List<Livro> listaDeLivros)
+       static void CarregarDados(List<Venda> listaDeVendas, List<Filme> listaDeFilmes, List<Livro> listaDeLivros)
         {
             string caminhoArquivoVendas = "vendas.txt";
             string caminhoArquivoFilmes = "filmes.txt";
             string caminhoArquivoLivros = "livros.txt";
-
-            if (!System.IO.File.Exists(caminhoArquivoVendas))
+        
+            if (!File.Exists(caminhoArquivoVendas))
             {
-                System.IO.File.WriteAllText(caminhoArquivoVendas, "");
+                File.WriteAllText(caminhoArquivoVendas, "");
             }
             else
             {
-                foreach (string linha in System.IO.File.ReadAllLines("vendas.txt"))
+                foreach (string linha in File.ReadAllLines(caminhoArquivoVendas))
                 {
                     listaDeVendas.Add(Venda.CarregarLinha(linha));
                 }
             }
-
-            if (!System.IO.File.Exists(caminhoArquivoFilmes))
+        
+            if (!File.Exists(caminhoArquivoFilmes))
             {
-                System.IO.File.WriteAllText(caminhoArquivoFilmes, "");
+                File.WriteAllText(caminhoArquivoFilmes, "");
             }
             else
             {
-                foreach (string linha in System.IO.File.ReadAllLines("filmes.txt"))
+                foreach (string linha in File.ReadAllLines(caminhoArquivoFilmes))
                 {
                     listaDeFilmes.Add(Filme.CarregarLinha(linha));
                 }
             }
-
-            if (!System.IO.File.Exists(caminhoArquivoLivros))
+        
+            if (!File.Exists(caminhoArquivoLivros))
             {
-                System.IO.File.WriteAllText(caminhoArquivoLivros, "");
+                File.WriteAllText(caminhoArquivoLivros, "");
             }
             else
             {
-                foreach (string linha in System.IO.File.ReadAllLines("livros.txt"))
+                foreach (string linha in File.ReadAllLines(caminhoArquivoLivros))
                 {
                     listaDeLivros.Add(Livro.CarregarLinha(linha));
                 }
@@ -593,31 +593,39 @@ namespace SistemaMonoliticoLivraria
         }
 
         static void SalvarDados(List<Venda> listaDeVendas, List<Filme> listaDeFilmes, List<Livro> listaDeLivros)
-        {
+            {
             string caminhoArquivoVendas = "vendas.txt";
             string caminhoArquivoFilmes = "filmes.txt";
             string caminhoArquivoLivros = "livros.txt";
-            using (StreamWriter writer = new StreamWriter(caminhoArquivoVendas))
+
+            List<string> linhasVendas = new List<string>();
+        
+            foreach (Venda venda in listaDeVendas)
             {
-                foreach (Venda venda in listaDeVendas)
-                {
-                    writer.WriteLine(venda.LinhaDeSalvamento());
-                }
+                linhasVendas.Add(venda.LinhaDeSalvamento());
             }
-            using (StreamWriter writer = new StreamWriter(caminhoArquivoFilmes))
+
+            File.WriteAllLines(caminhoArquivoVendas, linhasVendas);
+        
+        
+            List<string> linhasFilmes = new List<string>();
+        
+            foreach (Filme filme in listaDeFilmes)
             {
-                foreach (Filme filme in listaDeFilmes)
-                {
-                    writer.WriteLine(filme.LinhaDeSalvamento());
-                }
+                linhasFilmes.Add(filme.LinhaDeSalvamento());
             }
-            using (StreamWriter writer = new StreamWriter(caminhoArquivoLivros))
+        
+            File.WriteAllLines(caminhoArquivoFilmes, linhasFilmes);
+        
+        
+            List<string> linhasLivros = new List<string>();
+        
+            foreach (Livro livro in listaDeLivros)
             {
-                foreach (Livro livro in listaDeLivros)
-                {
-                    writer.WriteLine(livro.LinhaDeSalvamento());
-                }
+                linhasLivros.Add(livro.LinhaDeSalvamento());
             }
+        
+            File.WriteAllLines(caminhoArquivoLivros, linhasLivros);
         }
-    }
+            }
 }
