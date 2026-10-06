@@ -31,15 +31,19 @@ namespace SistemaMonoliticoLivraria
             //                                        CAMADA DE INTERFACE DO USUÁRIO                                          ///
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+            Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("===============================================================");
-            Console.WriteLine("=   Bem-vindo à empresa de locação de livros e filmes!        =");
+            Console.WriteLine("=                    Bem-vindo ao PlotSys!                    =");
             Console.WriteLine("===============================================================");
+             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("= 1 - Cadastrar Produto                                       =");
             Console.WriteLine("= 2 - Realizar Venda                                          =");
             Console.WriteLine("= 3 - Consultar / Excluir Produto                             =");
             Console.WriteLine("= 4 - Imprimir Estoque                                        =");
             Console.WriteLine("= 5 - Imprimir Relatório de Vendas                            =");
+             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("= 0 - Sair                                                    =");
+             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("===============================================================");
             Console.WriteLine("= Digite a opção desejada:                                    =");
             Console.WriteLine("===============================================================");
@@ -65,12 +69,16 @@ namespace SistemaMonoliticoLivraria
                     break;
                 case 0:
                     SalvarDados(listaDeVendas, listaDeFilmes, listaDeLivros);
+                    Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.WriteLine("Saindo do sistema...");
                     Console.WriteLine("===============================================================");
+                    Console.ResetColor();
                     break;
                 default:
+                    Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Opção inválida. Tente novamente.");
                     Console.WriteLine("===============================================================");
+                    Console.ResetColor();
                     break;
             }
 
@@ -121,6 +129,7 @@ namespace SistemaMonoliticoLivraria
 
             public void ExibirInformacoesVenda()
             {
+                Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine("===============================================================");
                 Console.WriteLine($"Produto: {Produto}");
                 Console.WriteLine($"Tipo de Produto: {TipoProduto}");
@@ -167,6 +176,7 @@ namespace SistemaMonoliticoLivraria
 
             public void ExibirTodasInformacoes()
             {
+                Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine($"Título: {Titulo}");
                 Console.WriteLine($"Gênero: {Genero}");
                 Console.WriteLine($"Autor: {Autor}");
@@ -176,6 +186,7 @@ namespace SistemaMonoliticoLivraria
 
             public void ExibirEstoque()
             {
+                Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine("===============================================================");
                 Console.WriteLine($"Título: {Titulo}");
                 Console.WriteLine($"Quantidade em Estoque: {QuantidadeEstoque}");
@@ -218,6 +229,7 @@ namespace SistemaMonoliticoLivraria
             }
             public void ExibirTodasInformacoes()
             {
+                Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine($"Título: {Titulo}");
                 Console.WriteLine($"Gênero: {Genero}");
                 Console.WriteLine($"Diretor: {Diretor}");
@@ -227,6 +239,7 @@ namespace SistemaMonoliticoLivraria
 
             public void ExibirEstoque()
             {
+                Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine("===============================================================");
                 Console.WriteLine($"Título: {Titulo}");
                 Console.WriteLine($"Quantidade em Estoque: {QuantidadeEstoque}");
@@ -243,18 +256,22 @@ namespace SistemaMonoliticoLivraria
         static void CadastrarProduto(Filme filme, Livro livro, List<Filme> listaDeFilmes, List<Livro> listaDeLivros)
         {
             Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("===============================================================");
             Console.WriteLine("=                     Cadastrar Produto                       =");
             Console.WriteLine("===============================================================");
+            Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("Digite 1 para cadastrar um livro ou 2 para cadastrar um filme: ");
             Console.WriteLine("===============================================================");
 
             if (Console.ReadLine() == "1")
             {
                 Console.Clear();
+                Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.WriteLine("===============================================================");
                 Console.WriteLine("=                    Cadastrar Livro                          =");
                 Console.WriteLine("===============================================================");
+                Console.ForegroundColor = ConsoleColor.White;
                 Console.Write("Digite o título do livro: ");
                 livro.Titulo = Console.ReadLine();
                 Console.Write("Digite o gênero do livro: ");
@@ -273,9 +290,11 @@ namespace SistemaMonoliticoLivraria
             else
             {
                 Console.Clear();
+                Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.WriteLine("===============================================================");
                 Console.WriteLine("=                     Cadastrar Filme                         =");
                 Console.WriteLine("===============================================================");
+                Console.ForegroundColor = ConsoleColor.White;
                 Console.Write("Digite o título do filme: ");
                 filme.Titulo = Console.ReadLine();
                 Console.Write("Digite o gênero do filme: ");
@@ -297,9 +316,11 @@ namespace SistemaMonoliticoLivraria
         static void RealizarVenda(Venda venda, Filme Produtofilme, Livro Produtolivro, List<Venda> listaDeVendas, List<Filme> listaDeFilmes, List<Livro> listaDeLivros)
         {
             Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("===============================================================");
             Console.WriteLine("=                     Realizar Venda                          =");
             Console.WriteLine("===============================================================");
+            Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("Digite 1 para vender um livro ou 2 para vender um filme: ");
             Console.WriteLine("===============================================================");
 
@@ -315,7 +336,9 @@ namespace SistemaMonoliticoLivraria
                 {
                     if (listaDeLivros[i].Titulo == tituloVenda)
                     {
-                        Console.WriteLine("ÍNFORMAÇÕES DO LIVRO:");
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.WriteLine("INFORMAÇÕES DO LIVRO:");
+                        Console.ForegroundColor = ConsoleColor.White;
                         listaDeLivros[i].ExibirTodasInformacoes();
 
                         Console.WriteLine("===============================================================");
@@ -324,7 +347,7 @@ namespace SistemaMonoliticoLivraria
 
                         if (Console.ReadLine() == "1")
                         {
-                            Console.WriteLine("digite a quantidade de unidades a serem vendidas: ");
+                            Console.WriteLine("Digite a quantidade de unidades a serem vendidas: ");
                             int quantidadeVendas = int.Parse(Console.ReadLine());
                             
                             if (quantidadeVendas <= listaDeLivros[i].QuantidadeEstoque)
@@ -333,6 +356,7 @@ namespace SistemaMonoliticoLivraria
                             }
                             else
                             {
+                                Console.ForegroundColor = ConsoleColor.Red;
                                 Console.WriteLine("Quantidade insuficiente em estoque.");
                                 Console.WriteLine("===============================================================");
                                 return;
@@ -349,6 +373,7 @@ namespace SistemaMonoliticoLivraria
                         }
                         else
                         {
+                            Console.ForegroundColor = ConsoleColor.Red;
                             Console.WriteLine("VENDA CANCELADA.");
                             Console.WriteLine("===============================================================");
                         }
@@ -368,7 +393,9 @@ namespace SistemaMonoliticoLivraria
                 {
                     if (listaDeFilmes[i].Titulo == tituloVenda)
                     {
-                        Console.WriteLine("ÍNFORMAÇÕES DO FILME:");
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.WriteLine("INFORMAÇÕES DO FILME:");
+                        Console.ForegroundColor = ConsoleColor.White;
                         listaDeFilmes[i].ExibirTodasInformacoes();
 
                         Console.WriteLine("===============================================================");
@@ -386,6 +413,7 @@ namespace SistemaMonoliticoLivraria
                             }
                             else
                             {
+                                Console.ForegroundColor = ConsoleColor.Red;
                                 Console.WriteLine("Quantidade insuficiente em estoque.");
                                 Console.WriteLine("===============================================================");
                                 return;
@@ -402,6 +430,7 @@ namespace SistemaMonoliticoLivraria
                         }
                         else
                         {
+                            Console.ForegroundColor = ConsoleColor.Red;
                             Console.WriteLine("VENDA CANCELADA.");
                             Console.WriteLine("===============================================================");
                         }
@@ -414,9 +443,11 @@ namespace SistemaMonoliticoLivraria
         static void ConsultarExcluirProduto(Filme filme, Livro livro, List<Filme> listaDeFilmes, List<Livro> listaDeLivros)
         {
             Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("===============================================================");
             Console.WriteLine("=                     CONSULTAR/EXCLUIR PRODUTO               =");
             Console.WriteLine("===============================================================");
+            Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("Digite 1 para consultar/excluir um livro" +
                             "\nDigite 2 para consultar/excluir um filme: ");
             Console.WriteLine("===============================================================");
@@ -434,7 +465,9 @@ namespace SistemaMonoliticoLivraria
                 {
                     if (listaDeLivros[i].Titulo == tituloConsulta)
                     {
-                        Console.WriteLine("ÍNFORMAÇÕES DO LIVRO:");
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.WriteLine("INFORMAÇÕES DO LIVRO:");
+                        Console.ForegroundColor = ConsoleColor.White;
                         listaDeLivros[i].ExibirTodasInformacoes();
                         Console.WriteLine("===============================================================");
                         Console.WriteLine("Deseja excluir este livro? (1 - SIM, 2 - NÃO)");
@@ -442,11 +475,13 @@ namespace SistemaMonoliticoLivraria
                         if (Console.ReadLine() == "1")
                         {
                             listaDeLivros.RemoveAt(i);
+                            Console.ForegroundColor = ConsoleColor.Green;
                             Console.WriteLine("LIVRO EXCLUÍDO COM SUCESSO.");
                             Console.WriteLine("===============================================================");
                         }
                         else
                         {
+                            Console.ForegroundColor = ConsoleColor.Red;
                             Console.WriteLine("EXCLUSÃO CANCELADA.");
                             Console.WriteLine("===============================================================");
                         }
@@ -462,6 +497,7 @@ namespace SistemaMonoliticoLivraria
 
                 if (!livroEncontrado)
                 {
+                    Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("LIVRO NÃO ENCONTRADO.");
                     Console.WriteLine("===============================================================");
                 }
@@ -469,6 +505,7 @@ namespace SistemaMonoliticoLivraria
             }
             else
             {
+                Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine("Digite o título do filme a ser consultado/excluído: ");
                 Console.Write("Título: ");
                 string tituloConsulta = Console.ReadLine();
@@ -480,7 +517,9 @@ namespace SistemaMonoliticoLivraria
                 {
                     if (listaDeFilmes[i].Titulo == tituloConsulta)
                     {
-                        Console.WriteLine("ÍNFORMAÇÕES DO FILME:");
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.WriteLine("INFORMAÇÕES DO FILME:");
+                        Console.ForegroundColor = ConsoleColor.White;
                         listaDeFilmes[i].ExibirTodasInformacoes();
                         Console.WriteLine("===============================================================");
                         Console.WriteLine("Deseja excluir este filme? (1 - SIM, 2 - NÃO)");
@@ -488,11 +527,13 @@ namespace SistemaMonoliticoLivraria
                         if (Console.ReadLine() == "1")
                         {
                             listaDeFilmes.RemoveAt(i);
+                            Console.ForegroundColor = ConsoleColor.Green;
                             Console.WriteLine("FILME EXCLUÍDO COM SUCESSO.");
                             Console.WriteLine("===============================================================");
                         }
                         else
                         {
+                            Console.ForegroundColor = ConsoleColor.Red;
                             Console.WriteLine("EXCLUSÃO CANCELADA.");
                             Console.WriteLine("===============================================================");
                         }
@@ -507,6 +548,7 @@ namespace SistemaMonoliticoLivraria
 
                 if (!filmeEncontrado)
                 {
+                    Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("FILME NÃO ENCONTRADO.");
                     Console.WriteLine("===============================================================");
                 }
@@ -516,9 +558,11 @@ namespace SistemaMonoliticoLivraria
         static void ImprimirEstoque(Filme filme, Livro livro, List<Filme> listaDeFilmes, List<Livro> listaDeLivros)
         {
             Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("===============================================================");
             Console.WriteLine("=                     Imprimir Estoque                        =");
             Console.WriteLine("===============================================================");
+            Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("Estoque de filmes: ");
             foreach (var filmes in listaDeFilmes)
             {
