@@ -48,7 +48,7 @@ namespace SistemaMonoliticoLivraria
             Console.WriteLine("= Digite a opção desejada:                                    =");
             Console.WriteLine("===============================================================");
 
-            int opcao = Convert.ToInt32(Console.ReadLine());
+            int opcao = int.Parse(Console.ReadLine());
 
             switch (opcao)
             {
