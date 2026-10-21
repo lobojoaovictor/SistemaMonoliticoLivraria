@@ -31,59 +31,66 @@ namespace SistemaMonoliticoLivraria
             //                                        CAMADA DE INTERFACE DO USUÁRIO                                          ///
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("===============================================================");
-            Console.WriteLine("=                    Bem-vindo ao PlotSys!                    =");
-            Console.WriteLine("===============================================================");
-             Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine("= 1 - Cadastrar Produto                                       =");
-            Console.WriteLine("= 2 - Realizar Venda                                          =");
-            Console.WriteLine("= 3 - Consultar / Excluir Produto                             =");
-            Console.WriteLine("= 4 - Imprimir Estoque                                        =");
-            Console.WriteLine("= 5 - Imprimir Relatório de Vendas                            =");
-             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("= 0 - Sair                                                    =");
-             Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine("===============================================================");
-            Console.WriteLine("= Digite a opção desejada:                                    =");
-            Console.WriteLine("===============================================================");
+            int opcao;
 
-            int opcao = int.Parse(Console.ReadLine());
-
-            switch (opcao)
-            {
-                case 1:
-                    CadastrarProduto(filme, livro, listaDeFilmes, listaDeLivros);
-                    break;
-                case 2:
-                    RealizarVenda(venda, filme, livro, listaDeVendas, listaDeFilmes, listaDeLivros);
-                    break;
-                case 3:
-                    ConsultarExcluirProduto(filme, livro, listaDeFilmes, listaDeLivros);
-                    break;
-                case 4:
-                    ImprimirEstoque(filme, livro, listaDeFilmes, listaDeLivros);
-                    break;
-                case 5:
-                    ImprimirRelatorioVendas(listaDeVendas);
-                    break;
-                case 0:
-                    SalvarDados(listaDeVendas, listaDeFilmes, listaDeLivros);
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine("Saindo do sistema...");
-                    Console.WriteLine("===============================================================");
-                    Console.ResetColor();
-                    break;
-                default:
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Opção inválida. Tente novamente.");
-                    Console.WriteLine("===============================================================");
-                    Console.ResetColor();
-                    break;
-            }
-
-
-
+            do{
+                Console.Clear();
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("===============================================================");
+                Console.WriteLine("=                    Bem-vindo ao PlotSys!                    =");
+                Console.WriteLine("===============================================================");
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine("= 1 - Cadastrar Produto                                       =");
+                Console.WriteLine("= 2 - Realizar Venda                                          =");
+                Console.WriteLine("= 3 - Consultar / Excluir Produto                             =");
+                Console.WriteLine("= 4 - Imprimir Estoque                                        =");
+                Console.WriteLine("= 5 - Imprimir Relatório de Vendas                            =");
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("= 0 - Sair                                                    =");
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine("===============================================================");
+                Console.WriteLine("= Digite a opção desejada:                                    =");
+                Console.WriteLine("===============================================================");
+    
+                opcao = int.Parse(Console.ReadLine());
+    
+                switch (opcao)
+                {
+                    case 1:
+                        CadastrarProduto(filme, livro, listaDeFilmes, listaDeLivros);
+                        break;
+                    case 2:
+                        RealizarVenda(venda, filme, livro, listaDeVendas, listaDeFilmes, listaDeLivros);
+                        break;
+                    case 3:
+                        ConsultarExcluirProduto(filme, livro, listaDeFilmes, listaDeLivros);
+                        break;
+                    case 4:
+                        ImprimirEstoque(filme, livro, listaDeFilmes, listaDeLivros);
+                        break;
+                    case 5:
+                        ImprimirRelatorioVendas(listaDeVendas);
+                        break;
+                    case 0:
+                        SalvarDados(listaDeVendas, listaDeFilmes, listaDeLivros);
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine("Saindo do sistema...");
+                        Console.WriteLine("===============================================================");
+                        Console.ResetColor();
+                        break;
+                    default:
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Opção inválida. Tente novamente.");
+                        Console.WriteLine("===============================================================");
+                        Console.ResetColor();
+                        break;
+                }
+                if (opcao != 0)
+                {
+                    Console.WriteLine("\nPressione qualquer tecla para voltar ao menu...");
+                    Console.ReadKey();
+                }
+            }while (opcao != 0);
         }
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
