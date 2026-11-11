@@ -20,6 +20,8 @@ namespace SistemaMonoliticoLivraria
         static void Main(string[] args)
         {
 
+            CriarBancoETabelas();
+
             List<Venda> listaDeVendas = new List<Venda>();
             List<Filme> listaDeFilmes = new List<Filme>();
             List<Livro> listaDeLivros = new List<Livro>();
@@ -131,7 +133,7 @@ namespace SistemaMonoliticoLivraria
             public string InsertVenda()
             {
                 string sql =
-                    "INSERT INTO livro " +
+                    "INSERT INTO vendas " +
                     "(Produto, TipoProduto, Preco, QuantidadeVendida, TotalVenda)" +
                     "VALUES (@Produto, @TipoProduto, @Preco, @QuantidadeVendida, @TotalVenda);";
 
@@ -179,7 +181,7 @@ namespace SistemaMonoliticoLivraria
             public string InsertFilme()
             {
                 string sql =
-                    "INSERT INTO filme" +
+                    "INSERT INTO filmes" +
                     "(Titulo, Genero, Diretor, Preco, QuantidadeEstoque)" +
                     "VALUES (@Titulo, @Genero, @Diretor, @Preco, @QuantidadeEstoque);";
 
@@ -700,6 +702,55 @@ namespace SistemaMonoliticoLivraria
 
             return conexao;
         }      
+
+        static void CriarBancoETabelas()
+{
+    using (MySqlConnection conexao = new MySqlConnection(
+        "Server=localhost;Port=3306;User ID=root;Password=;"))
+    {
+        conexao.Open();
+
+        string sqlBanco = "CREATE DATABASE IF NOT EXISTS locadora";
+
+        MySqlCommand comandoBanco = new MySqlCommand(sqlBanco, conexao);
+        comandoBanco.ExecuteNonQuery();
+    }
+
+    using (MySqlConnection conexao = Conexao())
+    {
+        string sqlTabelas = @"
+            CREATE TABLE IF NOT EXISTS filmes (
+                Id INT AUTO_INCREMENT PRIMARY KEY,
+                Titulo VARCHAR(150) NOT NULL,
+                Genero VARCHAR(100) NOT NULL,
+                Diretor VARCHAR(150) NOT NULL,
+                Preco DOUBLE NOT NULL,
+                QuantidadeEstoque INT NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS livros (
+                Id INT AUTO_INCREMENT PRIMARY KEY,
+                Titulo VARCHAR(150) NOT NULL,
+                Genero VARCHAR(100) NOT NULL,
+                Autor VARCHAR(150) NOT NULL,
+                Preco DOUBLE NOT NULL,
+                QuantidadeEstoque INT NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS vendas (
+                Id INT AUTO_INCREMENT PRIMARY KEY,
+                Produto VARCHAR(150) NOT NULL,
+                TipoProduto VARCHAR(50) NOT NULL,
+                Preco DOUBLE NOT NULL,
+                QuantidadeVendida INT NOT NULL,
+                TotalVenda DOUBLE NOT NULL
+            );
+        ";
+
+        MySqlCommand comando = new MySqlCommand(sqlTabelas, conexao);
+        comando.ExecuteNonQuery();
+    }
+}
 
         static void CarregarDados(List<Filme> listaDeFilmes, List<Livro> listaDeLivros, List<Venda> listaDeVendas)
         {
