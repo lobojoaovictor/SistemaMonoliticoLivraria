@@ -11,6 +11,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using static System.Net.WebRequestMethods;
+using File = System.IO.File;
 
 
 namespace SistemaMonoliticoLivraria
@@ -27,7 +28,7 @@ namespace SistemaMonoliticoLivraria
             List<Livro> listaDeLivros = new List<Livro>();
 
             Venda venda = new Venda();
-            
+
 
             CarregarDados(listaDeFilmes, listaDeLivros, listaDeVendas);
 
@@ -45,11 +46,12 @@ namespace SistemaMonoliticoLivraria
                 Console.WriteLine("=                    Bem-vindo ao PlotSys!                    =");
                 Console.WriteLine("===============================================================");
                 Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine("= 1 - Cadastrar Produto                                       =");
-                Console.WriteLine("= 2 - Realizar Venda                                          =");
-                Console.WriteLine("= 3 - Consultar / Excluir Produto                             =");
-                Console.WriteLine("= 4 - Imprimir Estoque                                        =");
-                Console.WriteLine("= 5 - Imprimir Relatório de Vendas                            =");
+                Console.WriteLine("= 1 - Criar Banco e Inserir Dados                             =");
+                Console.WriteLine("= 2 - Cadastrar Produto                                       =");
+                Console.WriteLine("= 3 - Realizar Venda                                          =");
+                Console.WriteLine("= 4 - Consultar / Excluir Produto                             =");
+                Console.WriteLine("= 5 - Imprimir Estoque                                        =");
+                Console.WriteLine("= 6 - Imprimir Relatório de Vendas                            =");
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("= 0 - Sair                                                    =");
                 Console.ForegroundColor = ConsoleColor.White;
@@ -72,18 +74,21 @@ namespace SistemaMonoliticoLivraria
                 switch (opcao)
                 {
                     case 1:
-                        CadastrarProduto(listaDeFilmes, listaDeLivros);
+                        CriarBancoLocadoraETabelas();
                         break;
                     case 2:
-                        RealizarVenda(venda, listaDeVendas, listaDeFilmes, listaDeLivros);
+                        CadastrarProduto(listaDeFilmes, listaDeLivros);
                         break;
                     case 3:
-                        ConsultarExcluirProduto(listaDeFilmes, listaDeLivros);
+                        RealizarVenda(venda, listaDeVendas, listaDeFilmes, listaDeLivros);
                         break;
                     case 4:
-                        ImprimirEstoque(listaDeFilmes, listaDeLivros);
+                        ConsultarExcluirProduto(listaDeFilmes, listaDeLivros);
                         break;
                     case 5:
+                        ImprimirEstoque(listaDeFilmes, listaDeLivros);
+                        break;
+                    case 6:
                         ImprimirRelatorioVendas(listaDeVendas);
                         break;
                     case 0:
@@ -91,7 +96,7 @@ namespace SistemaMonoliticoLivraria
                         Console.WriteLine("Saindo do sistema...");
                         Console.WriteLine("===============================================================");
                         Console.ResetColor();
-                        break;
+                        break;                    
                     default:
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("Opção inválida. Tente novamente.");
@@ -119,8 +124,21 @@ namespace SistemaMonoliticoLivraria
             public double Preco;
             public int QuantidadeVendida;
             public double TotalVenda;
+            public DateTime DataVenda;
+            public TimeSpan HoraVenda;
 
             public Venda(string produto, string tipoProduto, double preco, int quantidadeVendida)
+            {
+                Id = 0;                
+                Produto = produto;
+                TipoProduto = tipoProduto;
+                Preco = preco;
+                QuantidadeVendida = quantidadeVendida;
+                TotalVenda = preco * quantidadeVendida;
+                DataVenda = DateTime.Now;
+                HoraVenda = DateTime.Now.TimeOfDay;
+            }
+            public Venda(string produto, string tipoProduto, double preco, int quantidadeVendida, DateTime dataVenda, TimeSpan horaVenda)
             {
                 Id = 0;
                 Produto = produto;
@@ -128,27 +146,31 @@ namespace SistemaMonoliticoLivraria
                 Preco = preco;
                 QuantidadeVendida = quantidadeVendida;
                 TotalVenda = preco * quantidadeVendida;
+                DataVenda = dataVenda;
+                HoraVenda = horaVenda;
             }
 
             public string InsertVenda()
             {
                 string sql =
                     "INSERT INTO vendas " +
-                    "(Produto, TipoProduto, Preco, QuantidadeVendida, TotalVenda)" +
-                    "VALUES (@Produto, @TipoProduto, @Preco, @QuantidadeVendida, @TotalVenda);";
+                    "(Produto, TipoProduto, Preco, QuantidadeVendida, TotalVenda, DataVenda, HoraVenda)" +
+                    "VALUES (@Produto, @TipoProduto, @Preco, @QuantidadeVendida, @TotalVenda, @DataVenda, @HoraVenda);";
 
                 return sql;
-            }           
+            }
 
             public void ExibirInformacoesVenda()
             {
                 Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine("===============================================================");
+                Console.WriteLine("===============================================================");                             
                 Console.WriteLine($"Produto: {Produto}");
                 Console.WriteLine($"Tipo de Produto: {TipoProduto}");
                 Console.WriteLine($"Preço: {Preco:C}");
                 Console.WriteLine($"Quantidade Vendida: {QuantidadeVendida}");
                 Console.WriteLine($"Total da Venda: {TotalVenda:C}");
+                Console.WriteLine($"Data da Venda: {DataVenda}");
+                Console.WriteLine($"Hora da Venda: {HoraVenda}");
                 Console.WriteLine("===============================================================");
             }
         }
@@ -202,7 +224,7 @@ namespace SistemaMonoliticoLivraria
                     "WHERE Id = @Id" +
                     "AND QuantidadeEstoque >= @Quantidade";
                 return sql;
-                
+
             }
 
 
@@ -235,6 +257,17 @@ namespace SistemaMonoliticoLivraria
             public string Autor;
             public double Preco;
             public int QuantidadeEstoque;
+
+            public Livro(string titulo, string genero, string autor, double preco, int quantidadeEstoque)
+            {
+                Id = 0;
+                Titulo = titulo;
+                Genero = genero;
+                Autor = autor;
+                Preco = preco;
+                QuantidadeEstoque = quantidadeEstoque;
+
+            }
 
             public void AlterarEstoque(int valor)
             {
@@ -349,7 +382,8 @@ namespace SistemaMonoliticoLivraria
                     {
                         throw new FormatException();
                     }
-                } catch (FormatException)
+                }
+                catch (FormatException)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Não é possível cadastrar preço negativo. Tente novamente.");
@@ -365,7 +399,8 @@ namespace SistemaMonoliticoLivraria
                     {
                         throw new FormatException();
                     }
-                } catch (FormatException)
+                }
+                catch (FormatException)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Não é possível inserir estoque negativo. Tente novamente.");
@@ -374,7 +409,7 @@ namespace SistemaMonoliticoLivraria
                     return;
                 }
                 Console.WriteLine("===============================================================");
-                                
+
                 InserirProduto(livro);
                 listaDeLivros.Add(livro);
             }
@@ -393,11 +428,39 @@ namespace SistemaMonoliticoLivraria
                 Console.Write("Digite o diretor do filme: ");
                 filme.Diretor = Console.ReadLine();
                 Console.Write("Digite o preço do filme: ");
-                filme.Preco = double.Parse(Console.ReadLine());
+                try
+                {
+                    filme.Preco = double.Parse(Console.ReadLine());
+                    if (filme.Preco < 0)
+                    {
+                        throw new FormatException();
+                    }
+                }
+                catch (FormatException)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Não é possível cadastrar preço negativo. Tente novamente.");
+                    Console.WriteLine("===============================================================");
+                    Console.ResetColor();
+                    return;
+                }
                 Console.Write("Digite a quantidade em estoque do filme: ");
-                filme.QuantidadeEstoque = Convert.ToInt32(Console.ReadLine());
-                Console.WriteLine("===============================================================");
-                                
+                try
+                {
+                    filme.QuantidadeEstoque = Convert.ToInt32(Console.ReadLine());
+                    if (filme.QuantidadeEstoque < 0)
+                    {
+                        throw new FormatException();
+                    }
+                }
+                catch (FormatException)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Não é possível inserir estoque negativo. Tente novamente.");
+                    Console.WriteLine("===============================================================");
+                    Console.ResetColor();
+                    return;
+                }
                 InserirProduto(filme);
                 listaDeFilmes.Add(filme);
             }
@@ -407,6 +470,10 @@ namespace SistemaMonoliticoLivraria
 
         static void RealizarVenda(Venda venda, List<Venda> listaDeVendas, List<Filme> listaDeFilmes, List<Livro> listaDeLivros)
         {
+            int opcaoMenuPrincipalVenda;
+            int opcaoMenuConfirmarVendaLivro;
+            int opcaoMenuConfirmarVendaFilme;
+
             Console.Clear();
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("===============================================================");
@@ -416,7 +483,24 @@ namespace SistemaMonoliticoLivraria
             Console.WriteLine("Digite 1 para vender um livro ou 2 para vender um filme: ");
             Console.WriteLine("===============================================================");
 
-            if (Console.ReadLine() == "1")
+            try
+            {
+                opcaoMenuPrincipalVenda = int.Parse(Console.ReadLine());
+                if (opcaoMenuPrincipalVenda != 1 && opcaoMenuPrincipalVenda != 2)
+                {
+                    throw new FormatException();
+                }
+            }
+            catch (FormatException)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Opção inválida. Tente novamente.");
+                Console.WriteLine("===============================================================");
+                Console.ResetColor();
+                return; // Retorna para o menu principal
+            }
+
+            if (opcaoMenuPrincipalVenda == 1)
             {
                 Console.WriteLine("Digite o título do livro a ser vendido. ");
                 Console.Write("Título: ");
@@ -436,8 +520,24 @@ namespace SistemaMonoliticoLivraria
                         Console.WriteLine("===============================================================");
                         Console.WriteLine("Confirmar venda? (1 - SIM, 2 - NÃO)");
                         Console.WriteLine("===============================================================");
+                        try
+                        {
+                            opcaoMenuConfirmarVendaLivro = int.Parse(Console.ReadLine());
+                            if (opcaoMenuConfirmarVendaLivro != 1 && opcaoMenuConfirmarVendaLivro != 2)
+                            {
+                                throw new FormatException();
+                            }
+                        }
+                        catch (FormatException)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("Opção inválida. Tente novamente.");
+                            Console.WriteLine("===============================================================");
+                            Console.ResetColor();
+                            return;
+                        }
 
-                        if (Console.ReadLine() == "1")
+                        if (opcaoMenuConfirmarVendaLivro == 1)
                         {
                             Console.WriteLine("Digite a quantidade de unidades a serem vendidas: ");
                             int quantidadeVendas = int.Parse(Console.ReadLine());
@@ -465,7 +565,7 @@ namespace SistemaMonoliticoLivraria
                             VenderProduto(livro.Id, quantidadeVendas, livro);
                             InserirVenda(venda);
                             listaDeVendas.Add(venda);
-                            
+
                         }
                         else
                         {
@@ -498,7 +598,24 @@ namespace SistemaMonoliticoLivraria
                         Console.WriteLine("Confirmar venda? (1 - SIM, 2 - NÃO)");
                         Console.WriteLine("===============================================================");
 
-                        if (Console.ReadLine() == "1")
+                        try
+                        {
+                            opcaoMenuConfirmarVendaFilme = int.Parse(Console.ReadLine());
+                            if (opcaoMenuConfirmarVendaFilme != 1 && opcaoMenuConfirmarVendaFilme != 2)
+                            {
+                                throw new FormatException();
+                            }
+
+                        }
+                        catch (FormatException)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("Opção inválida. Tente novamente.");
+                            Console.WriteLine("===============================================================");
+                            Console.ResetColor();
+                            return;
+                        }
+                        if (opcaoMenuConfirmarVendaFilme == 1)
                         {
                             Console.WriteLine("digite a quantidade de unidades a serem vendidas: ");
                             int quantidadeVendas = int.Parse(Console.ReadLine());
@@ -527,7 +644,7 @@ namespace SistemaMonoliticoLivraria
                             VenderProduto(filme.Id, quantidadeVendas, filme);
                             InserirVenda(venda);
                             listaDeVendas.Add(venda);
-                            
+
                         }
                         else
                         {
@@ -535,14 +652,18 @@ namespace SistemaMonoliticoLivraria
                             Console.WriteLine("VENDA CANCELADA.");
                             Console.WriteLine("===============================================================");
                         }
+                        
                     }
                 }
             }
         }
 
-
         static void ConsultarExcluirProduto(List<Filme> listaDeFilmes, List<Livro> listaDeLivros)
         {
+            int opcaoMenuPrincipalConsulta;
+            int opcaoMenuConfirmarExclusaoLivro;
+            int opcaoMenuConfirmarExclusaoFilme;
+
             Console.Clear();
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("===============================================================");
@@ -553,7 +674,25 @@ namespace SistemaMonoliticoLivraria
                             "\nDigite 2 para consultar/excluir um filme: ");
             Console.WriteLine("===============================================================");
 
-            if (Console.ReadLine() == "1")
+            try
+            {
+                opcaoMenuPrincipalConsulta = int.Parse(Console.ReadLine());
+                if (opcaoMenuPrincipalConsulta != 1 && opcaoMenuPrincipalConsulta != 2)
+                {
+                    throw new FormatException();
+                }
+
+            }
+            catch (FormatException)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Opção inválida. Tente novamente.");
+                Console.WriteLine("===============================================================");
+                Console.ResetColor();
+                return; 
+            }
+
+            if (opcaoMenuPrincipalConsulta == 1)
             {
                 bool livroEncontrado = false;
 
@@ -573,7 +712,25 @@ namespace SistemaMonoliticoLivraria
                         Console.WriteLine("===============================================================");
                         Console.WriteLine("Deseja excluir este livro? (1 - SIM, 2 - NÃO)");
                         Console.WriteLine("===============================================================");
-                        if (Console.ReadLine() == "1")
+
+                        try
+                        {
+                            opcaoMenuConfirmarExclusaoLivro = int.Parse(Console.ReadLine());
+                            if (opcaoMenuConfirmarExclusaoLivro != 1 && opcaoMenuConfirmarExclusaoLivro != 2)
+                            {
+                                throw new FormatException();
+                            }
+                        }
+                        catch (FormatException)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("Opção inválida. Tente novamente.");
+                            Console.WriteLine("===============================================================");
+                            Console.ResetColor();
+                            return;
+                        }
+
+                        if (opcaoMenuConfirmarExclusaoLivro == 1)
                         {
                             ExcluirProduto("livros", listaDeLivros[i].Id);
                             listaDeLivros.RemoveAt(i);
@@ -626,7 +783,25 @@ namespace SistemaMonoliticoLivraria
                         Console.WriteLine("===============================================================");
                         Console.WriteLine("Deseja excluir este filme? (1 - SIM, 2 - NÃO)");
                         Console.WriteLine("===============================================================");
-                        if (Console.ReadLine() == "1")
+
+                        try
+                        {
+                            opcaoMenuConfirmarExclusaoFilme = int.Parse(Console.ReadLine());
+                            if (opcaoMenuConfirmarExclusaoFilme != 1 && opcaoMenuConfirmarExclusaoFilme != 2)
+                            {
+                                throw new FormatException();
+                            }
+                        }
+                        catch (FormatException)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("Opção inválida. Tente novamente.");
+                            Console.WriteLine("===============================================================");
+                            Console.ResetColor();
+                            return;
+                        }
+
+                        if (opcaoMenuConfirmarExclusaoFilme == 1)
                         {
                             ExcluirProduto("filmes", listaDeFilmes[i].Id);
                             listaDeFilmes.RemoveAt(i);
@@ -658,260 +833,360 @@ namespace SistemaMonoliticoLivraria
             }
         }
 
-        static void ImprimirEstoque(List<Filme> listaDeFilmes, List<Livro> listaDeLivros)
-        {
-            Console.Clear();
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("===============================================================");
-            Console.WriteLine("=                     Imprimir Estoque                        =");
-            Console.WriteLine("===============================================================");
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine("Estoque de filmes: ");
+            static void ImprimirEstoque(List<Filme> listaDeFilmes, List<Livro> listaDeLivros)
+            {
+                Console.Clear();
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine("===============================================================");
+                Console.WriteLine("=                     Imprimir Estoque                        =");
+                Console.WriteLine("===============================================================");
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine("Estoque de filmes: ");
+                Console.ForegroundColor = ConsoleColor.Cyan;
             foreach (var filmes in listaDeFilmes)
-            {
-                filmes.ExibirEstoque();
-            }
+                {
+                    filmes.ExibirEstoque();
+                }
 
-            Console.WriteLine("===============================================================");
+                Console.WriteLine("===============================================================");
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
             Console.WriteLine("Estoque de livros: ");
-            foreach (var livros in listaDeLivros)
-            {
-                livros.ExibirEstoque();
+                Console.ForegroundColor = ConsoleColor.White;
+                foreach (var livros in listaDeLivros)
+                {
+                    livros.ExibirEstoque();
+                }
+
+                Console.WriteLine("===============================================================");
+
             }
 
-            Console.WriteLine("===============================================================");
-
-        }
-
-        static void ImprimirRelatorioVendas(List<Venda> listaDeVendas)
-        {
-            foreach (var vendas in listaDeVendas)
+            static void ImprimirRelatorioVendas(List<Venda> listaDeVendas)
             {
-                vendas.ExibirInformacoesVenda();
-            }
-        }
-
-
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        ///                                             CAMADA DE PERSISTÊNCIA                                            ///
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        static MySqlConnection Conexao()
-        {
-            MySqlConnection conexao = new MySqlConnection("Server=localhost;Port=3306;Database=locadora;User ID=root;Password=;");
-            conexao.Open();
-
-            return conexao;
-        }      
-
-        static void CriarBancoETabelas()
-{
-    using (MySqlConnection conexao = new MySqlConnection(
-        "Server=localhost;Port=3306;User ID=root;Password=;"))
-    {
-        conexao.Open();
-
-        string sqlBanco = "CREATE DATABASE IF NOT EXISTS locadora";
-
-        MySqlCommand comandoBanco = new MySqlCommand(sqlBanco, conexao);
-        comandoBanco.ExecuteNonQuery();
-    }
-
-    using (MySqlConnection conexao = Conexao())
-    {
-        string sqlTabelas = @"
-            CREATE TABLE IF NOT EXISTS filmes (
-                Id INT AUTO_INCREMENT PRIMARY KEY,
-                Titulo VARCHAR(150) NOT NULL,
-                Genero VARCHAR(100) NOT NULL,
-                Diretor VARCHAR(150) NOT NULL,
-                Preco DOUBLE NOT NULL,
-                QuantidadeEstoque INT NOT NULL
-            );
-
-            CREATE TABLE IF NOT EXISTS livros (
-                Id INT AUTO_INCREMENT PRIMARY KEY,
-                Titulo VARCHAR(150) NOT NULL,
-                Genero VARCHAR(100) NOT NULL,
-                Autor VARCHAR(150) NOT NULL,
-                Preco DOUBLE NOT NULL,
-                QuantidadeEstoque INT NOT NULL
-            );
-
-            CREATE TABLE IF NOT EXISTS vendas (
-                Id INT AUTO_INCREMENT PRIMARY KEY,
-                Produto VARCHAR(150) NOT NULL,
-                TipoProduto VARCHAR(50) NOT NULL,
-                Preco DOUBLE NOT NULL,
-                QuantidadeVendida INT NOT NULL,
-                TotalVenda DOUBLE NOT NULL
-            );
-        ";
-
-        MySqlCommand comando = new MySqlCommand(sqlTabelas, conexao);
-        comando.ExecuteNonQuery();
-    }
-}
-
-        static void CarregarDados(List<Filme> listaDeFilmes, List<Livro> listaDeLivros, List<Venda> listaDeVendas)
-        {
-            CarregarFilmes(listaDeFilmes);
-            CarregarLivros(listaDeLivros);
-            CarregarVendas(listaDeVendas);
-        }
-
-        static void CarregarFilmes(List<Filme> listaDeFilmes)
-        {
-            MySqlConnection conexao = Conexao();
-
-            string comandoExec = "SELECT * FROM filmes";
-            MySqlCommand comando = new MySqlCommand(comandoExec, conexao);
-
-            MySqlDataReader leitor = comando.ExecuteReader();
-
-            while (leitor.Read())
-            {
-                Filme filme = new Filme();
-
-                filme.Id = leitor.GetInt32("Id");
-                filme.Titulo = leitor.GetString("Titulo");
-                filme.Genero = leitor.GetString("Genero");
-                filme.Diretor = leitor.GetString("Diretor");
-                filme.Preco = leitor.GetDouble("Preco");
-                filme.QuantidadeEstoque = leitor.GetInt32("QuantidadeEstoque");
-
-                listaDeFilmes.Add(filme);
+                foreach (var vendas in listaDeVendas)
+                {
+                    vendas.ExibirInformacoesVenda();
+                }
             }
 
-            conexao.Close();
-        }
+            static void CriarBancoLocadoraETabelas()
+            {
+                bool repetirMenu = true;
 
-        static void CarregarLivros(List<Livro> listaDeLivros)
-        {
-            MySqlConnection conexao = Conexao();
+            do
+            {
+                Console.Clear();
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.WriteLine("===============================================================");
+                Console.WriteLine("=           CRIAR BANCO DE DADOS E INSEÇÃO DE DADOS           =");
+                Console.WriteLine("===============================================================");
+                Console.WriteLine("= Digite 1 para criar o banco de dados e tabelas.             =" +
+                                "\n= Digite 2 para inserir dados dos arquivos .txt.              =" +
+                                "\n= Digite 0 para sair.                                         =");
+                Console.WriteLine("===============================================================");
 
-            string comandoExec = "SELECT * FROM livros";
-            MySqlCommand comando = new MySqlCommand(comandoExec, conexao);
+                int opcao = int.Parse(Console.ReadLine());
 
-            MySqlDataReader leitor = comando.ExecuteReader();
+                if (opcao == 1)
+                {
+                    CriarBancoETabelas();
+                    Console.WriteLine("===============================================================");
+                    Console.ForegroundColor = ConsoleColor.DarkGreen;
+                    Console.WriteLine("= BANCO DE DADOS E TABELAS CRIADOS COM SUCESSO.               =");
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Console.WriteLine("===============================================================");
+                }
+                else if (opcao == 2)
+                {
+                    InsertDadosTxt();
+                    Console.WriteLine("===============================================================");
+                    Console.ForegroundColor = ConsoleColor.DarkGreen;
+                    Console.WriteLine("= DADOS INSERIDOS COM SUCESSO.                                =");
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Console.WriteLine("===============================================================");
+                }
+                else if (opcao == 0)
+                {
+                    repetirMenu = false;
+                }
+            }
+            while (repetirMenu);
             
-            while (leitor.Read())
-            {
-                Livro livro = new Livro();
-
-                livro.Id = leitor.GetInt32("Id");
-                livro.Titulo = leitor.GetString("Titulo");
-                livro.Genero = leitor.GetString("Genero");
-                livro.Autor = leitor.GetString("Autor");
-                livro.Preco = leitor.GetDouble("Preco");
-                livro.QuantidadeEstoque = leitor.GetInt32("QuantidadeEstoque");
-
-                listaDeLivros.Add(livro);
-            }
-            conexao.Close();
-        }
-
-        static void CarregarVendas(List<Venda> listaDeVendas)
-        {
-            MySqlConnection conexao = Conexao();
-
-            string comandoExec = "SELECT * FROM vendas ";
-            MySqlCommand comando = new MySqlCommand(comandoExec, conexao);
-
-            MySqlDataReader leitor = comando.ExecuteReader();
-
-            while (leitor.Read())
-            {
-                Venda vendas = new Venda();
-
-                vendas.Id = leitor.GetInt32("Id");
-                vendas.Produto = leitor.GetString("Produto");
-                vendas.TipoProduto = leitor.GetString("TipoProduto");
-                vendas.Preco = leitor.GetDouble("Preco");
-                vendas.QuantidadeVendida = leitor.GetInt32("QuantidadeVendida");
-                vendas.TotalVenda = leitor.GetInt32("TotalVenda");
-
-                listaDeVendas.Add(vendas);
-            }
-            conexao.Close();
-        }
-
-        static bool ExcluirProduto(string tabela, int id)
-        {
-            string sql = $"DELETE FROM {tabela} WHERE Id = @Id";
-
-            MySqlConnection conexao = Conexao();
-          
-            MySqlCommand comando = new MySqlCommand(sql, conexao);
-            comando.Parameters.AddWithValue("@Id", id);
-
-            int linhasAfetadas = comando.ExecuteNonQuery();
-
-            conexao.Close();
-            return linhasAfetadas > 0;
-        }
-
-        static bool InserirProduto(Filme filme)
-        {           
-            MySqlConnection conexao = Conexao();
-
-
-            MySqlCommand comando = new MySqlCommand(filme.InsertFilme(), conexao);
-
-            comando.Parameters.AddWithValue("@Titulo", filme.Titulo);
-            comando.Parameters.AddWithValue("@Genero", filme.Genero);
-            comando.Parameters.AddWithValue("@Diretor", filme.Diretor);
-            comando.Parameters.AddWithValue("@Preco", filme.Preco);
-            comando.Parameters.AddWithValue("@QuantidadeEstoque", filme.QuantidadeEstoque);
-
-            int linhasAfetadas = comando.ExecuteNonQuery();
-            bool resultBool = linhasAfetadas > 0;
-
-            conexao.Close();
-            return resultBool;
-        }
-
-        static bool InserirProduto(Livro livro)
-        {
-            MySqlConnection conexao = Conexao();
-
-            MySqlCommand comando = new MySqlCommand(livro.InsertLivro(), conexao);
-
-            comando.Parameters.AddWithValue("@Titulo", livro.Titulo);
-            comando.Parameters.AddWithValue("@Genero", livro.Genero);
-            comando.Parameters.AddWithValue("@Autor", livro.Autor);
-            comando.Parameters.AddWithValue("@Preco", livro.Preco);
-            comando.Parameters.AddWithValue("@QuantidadeEstoque", livro.QuantidadeEstoque);
-
-            int linhasAfetadas = comando.ExecuteNonQuery();
-            bool resultBool = linhasAfetadas > 0;
-
-            conexao.Close();
-            return resultBool;
-        }
-        static bool InserirVenda(Venda venda) 
-        {
-
-            MySqlConnection conexao = Conexao();
-
-            MySqlCommand comando = new MySqlCommand(venda.InsertVenda(), conexao);
-
-            comando.Parameters.AddWithValue("@Produto", venda.Produto);
-            comando.Parameters.AddWithValue("@TipoProduto", venda.TipoProduto);
-            comando.Parameters.AddWithValue("@Preco", venda.Preco);
-            comando.Parameters.AddWithValue("@QuantidadeVendida", venda.QuantidadeVendida);
-            comando.Parameters.AddWithValue("@TotalVenda", venda.TotalVenda);
-
-            int linhasAfetadas = comando.ExecuteNonQuery();
-            bool resultBool = linhasAfetadas > 0;
-
-            conexao.Close();
-            return resultBool;
-        }        
-        
-        static void EditarProduto(int id, Filme filme)
-        {
-            MySqlConnection conexao = Conexao();
             
+
+            }
+
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ///                                             CAMADA DE PERSISTÊNCIA                                            ///
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            static MySqlConnection Conexao()
+            {
+                MySqlConnection conexao = new MySqlConnection("Server=localhost;Port=3306;Database=locadora;User ID=root;Password=;");
+                conexao.Open();
+
+                return conexao;
+            }
+
+            static void CriarBancoETabelas()
+            {
+                using (MySqlConnection conexao = new MySqlConnection(
+                "Server=localhost;Port=3306;User ID=root;Password=;"))
+                {
+                    conexao.Open();
+
+                    string sqlBanco = "CREATE DATABASE IF NOT EXISTS locadora";
+
+                    MySqlCommand comandoBanco = new MySqlCommand(sqlBanco, conexao);
+                    comandoBanco.ExecuteNonQuery();
+                }
+
+                using (MySqlConnection conexao = Conexao())
+                {
+                    string sqlTabelas = @"
+                CREATE TABLE IF NOT EXISTS filmes (
+                    Id INT AUTO_INCREMENT PRIMARY KEY,
+                    Titulo VARCHAR(150) NOT NULL,
+                    Genero VARCHAR(100) NOT NULL,
+                    Diretor VARCHAR(150) NOT NULL,
+                    Preco DOUBLE NOT NULL,
+                    QuantidadeEstoque INT NOT NULL
+                    );
+
+                CREATE TABLE IF NOT EXISTS livros (
+                    Id INT AUTO_INCREMENT PRIMARY KEY,
+                    Titulo VARCHAR(150) NOT NULL,
+                    Genero VARCHAR(100) NOT NULL,
+                    Autor VARCHAR(150) NOT NULL,
+                    Preco DOUBLE NOT NULL,
+                    QuantidadeEstoque INT NOT NULL
+                    );
+
+                CREATE TABLE IF NOT EXISTS vendas (
+                    Id INT AUTO_INCREMENT PRIMARY KEY,                    
+                    Produto VARCHAR(150) NOT NULL,
+                    TipoProduto VARCHAR(50) NOT NULL,
+                    Preco DOUBLE NOT NULL,
+                    QuantidadeVendida INT NOT NULL,
+                    TotalVenda DOUBLE NOT NULL,
+                    DataVenda DATE NOT NULL,
+                    HoraVenda TIME NOT NULL
+                    );
+                    ";
+
+                    MySqlCommand comando = new MySqlCommand(sqlTabelas, conexao);
+                    comando.ExecuteNonQuery();
+                }
+            }
+
+            static void InsertDadosTxt()
+            {                           
+                string caminhoArquivoFilmes = Path.Combine(AppContext.BaseDirectory, "dadosFilmes.txt");
+                string caminhoArquivoLivros = Path.Combine(AppContext.BaseDirectory, "dadosLivros.txt");
+                string caminhoArquivoVendas = Path.Combine(AppContext.BaseDirectory, "dadosVendas.txt");
+
+            if (File.Exists(caminhoArquivoFilmes))
+            {
+                string[] linhasFilmes = File.ReadAllLines(caminhoArquivoFilmes);
+                foreach (string linha in linhasFilmes)
+                {
+                    string[] dados = linha.Split(';');
+                    Filme filme = new Filme(dados[0], dados[1], dados[2], double.Parse(dados[3]), int.Parse(dados[4]));
+
+                    InserirProduto(filme);
+
+                }
+            }
+
+            if (File.Exists(caminhoArquivoLivros))
+            {
+                string[] linhasLivros = File.ReadAllLines(caminhoArquivoLivros);
+                foreach (string linha in linhasLivros)
+                {
+                    string[] dados = linha.Split(';');
+                    Livro livro = new Livro(dados[0], dados[1], dados[2], double.Parse(dados[3]), int.Parse(dados[4]));
+                    InserirProduto(livro);
+                }
+            }
+
+                if (File.Exists(caminhoArquivoVendas))
+                {
+                    string[] linhasVendas = File.ReadAllLines(caminhoArquivoVendas);
+                foreach (string linha in linhasVendas)
+                {
+                    string[] dados = linha.Split(';');
+                    Venda venda = new Venda(dados[0], dados[1], double.Parse(dados[2]), int.Parse(dados[3]), DateTime.Parse(dados[4]), TimeSpan.Parse(dados[5]));
+                    InserirVenda(venda);
+
+                }
+                }
+
+            }
+
+            static void CarregarDados(List<Filme> listaDeFilmes, List<Livro> listaDeLivros, List<Venda> listaDeVendas)
+            {
+                CarregarFilmes(listaDeFilmes);
+                CarregarLivros(listaDeLivros);
+                CarregarVendas(listaDeVendas);
+            }
+
+            static void CarregarFilmes(List<Filme> listaDeFilmes)
+            {
+                MySqlConnection conexao = Conexao();
+
+                string comandoExec = "SELECT * FROM filmes";
+                MySqlCommand comando = new MySqlCommand(comandoExec, conexao);
+
+                MySqlDataReader leitor = comando.ExecuteReader();
+
+                while (leitor.Read())
+                {
+                    Filme filme = new Filme();
+
+                    filme.Id = leitor.GetInt32("Id");
+                    filme.Titulo = leitor.GetString("Titulo");
+                    filme.Genero = leitor.GetString("Genero");
+                    filme.Diretor = leitor.GetString("Diretor");
+                    filme.Preco = leitor.GetDouble("Preco");
+                    filme.QuantidadeEstoque = leitor.GetInt32("QuantidadeEstoque");
+
+                    listaDeFilmes.Add(filme);
+                }
+
+                conexao.Close();
+            }
+
+            static void CarregarLivros(List<Livro> listaDeLivros)
+            {
+                MySqlConnection conexao = Conexao();
+
+                string comandoExec = "SELECT * FROM livros";
+                MySqlCommand comando = new MySqlCommand(comandoExec, conexao);
+
+                MySqlDataReader leitor = comando.ExecuteReader();
+
+                while (leitor.Read())
+                {
+                    Livro livro = new Livro();
+
+                    livro.Id = leitor.GetInt32("Id");
+                    livro.Titulo = leitor.GetString("Titulo");
+                    livro.Genero = leitor.GetString("Genero");
+                    livro.Autor = leitor.GetString("Autor");
+                    livro.Preco = leitor.GetDouble("Preco");
+                    livro.QuantidadeEstoque = leitor.GetInt32("QuantidadeEstoque");
+
+                    listaDeLivros.Add(livro);
+                }
+                conexao.Close();
+            }
+
+            static void CarregarVendas(List<Venda> listaDeVendas)
+            {
+                MySqlConnection conexao = Conexao();
+
+                string comandoExec = "SELECT * FROM vendas ";
+                MySqlCommand comando = new MySqlCommand(comandoExec, conexao);
+
+                MySqlDataReader leitor = comando.ExecuteReader();
+
+                while (leitor.Read())
+                {
+                    Venda vendas = new Venda();
+
+                    vendas.Id = leitor.GetInt32("Id");
+                    vendas.Produto = leitor.GetString("Produto");
+                    vendas.TipoProduto = leitor.GetString("TipoProduto");
+                    vendas.Preco = leitor.GetDouble("Preco");
+                    vendas.QuantidadeVendida = leitor.GetInt32("QuantidadeVendida");
+                    vendas.TotalVenda = leitor.GetDouble("TotalVenda");
+                    vendas.DataVenda = leitor.GetDateTime("DataVenda");
+                    vendas.HoraVenda = leitor.GetTimeSpan("HoraVenda");
+
+                    listaDeVendas.Add(vendas);
+                }
+                conexao.Close();
+            }
+
+            static bool ExcluirProduto(string tabela, int id)
+            {
+                string sql = $"DELETE FROM {tabela} WHERE Id = @Id";
+
+                MySqlConnection conexao = Conexao();
+
+                MySqlCommand comando = new MySqlCommand(sql, conexao);
+                comando.Parameters.AddWithValue("@Id", id);
+
+                int linhasAfetadas = comando.ExecuteNonQuery();
+
+                conexao.Close();
+                return linhasAfetadas > 0;
+            }
+
+            static bool InserirProduto(Filme filme)
+            {
+                MySqlConnection conexao = Conexao();
+
+
+                MySqlCommand comando = new MySqlCommand(filme.InsertFilme(), conexao);
+
+                comando.Parameters.AddWithValue("@Titulo", filme.Titulo);
+                comando.Parameters.AddWithValue("@Genero", filme.Genero);
+                comando.Parameters.AddWithValue("@Diretor", filme.Diretor);
+                comando.Parameters.AddWithValue("@Preco", filme.Preco);
+                comando.Parameters.AddWithValue("@QuantidadeEstoque", filme.QuantidadeEstoque);
+
+                int linhasAfetadas = comando.ExecuteNonQuery();
+                bool resultBool = linhasAfetadas > 0;
+
+                conexao.Close();
+                return resultBool;
+            }
+
+            static bool InserirProduto(Livro livro)
+            {
+                MySqlConnection conexao = Conexao();
+
+                MySqlCommand comando = new MySqlCommand(livro.InsertLivro(), conexao);
+
+                comando.Parameters.AddWithValue("@Titulo", livro.Titulo);
+                comando.Parameters.AddWithValue("@Genero", livro.Genero);
+                comando.Parameters.AddWithValue("@Autor", livro.Autor);
+                comando.Parameters.AddWithValue("@Preco", livro.Preco);
+                comando.Parameters.AddWithValue("@QuantidadeEstoque", livro.QuantidadeEstoque);
+
+                int linhasAfetadas = comando.ExecuteNonQuery();
+                bool resultBool = linhasAfetadas > 0;
+
+                conexao.Close();
+                return resultBool;
+            }
+            static bool InserirVenda(Venda venda)
+            {
+
+                MySqlConnection conexao = Conexao();
+
+                MySqlCommand comando = new MySqlCommand(venda.InsertVenda(), conexao);
+                            
+                comando.Parameters.AddWithValue("@Produto", venda.Produto);
+                comando.Parameters.AddWithValue("@TipoProduto", venda.TipoProduto);
+                comando.Parameters.AddWithValue("@Preco", venda.Preco);
+                comando.Parameters.AddWithValue("@QuantidadeVendida", venda.QuantidadeVendida);
+                comando.Parameters.AddWithValue("@TotalVenda", venda.TotalVenda);
+                comando.Parameters.AddWithValue("@DataVenda", venda.DataVenda);
+                comando.Parameters.AddWithValue("@HoraVenda", venda.HoraVenda);
+
+
+            int linhasAfetadas = comando.ExecuteNonQuery();
+                bool resultBool = linhasAfetadas > 0;
+
+                conexao.Close();
+                return resultBool;
+            }
+
+            static void EditarProduto(int id, Filme filme)
+            {
+                MySqlConnection conexao = Conexao();
+
                 MySqlCommand comando = new MySqlCommand(filme.UpdateFilme(), conexao);
 
                 comando.Parameters.AddWithValue("@Titulo", filme.Titulo);
@@ -922,13 +1197,13 @@ namespace SistemaMonoliticoLivraria
                 comando.Parameters.AddWithValue("@Id", id);
                 comando.ExecuteNonQuery();
 
-            conexao.Close();
-        }
+                conexao.Close();
+            }
 
-        static void EditarProduto(int id, Livro livro)
-        {
-            MySqlConnection conexao = Conexao();
-            
+            static void EditarProduto(int id, Livro livro)
+            {
+                MySqlConnection conexao = Conexao();
+
                 MySqlCommand comando = new MySqlCommand(livro.UpdateLivro(), conexao);
 
                 comando.Parameters.AddWithValue("@Titulo", livro.Titulo);
@@ -939,37 +1214,38 @@ namespace SistemaMonoliticoLivraria
                 comando.Parameters.AddWithValue("@Id", id);
                 comando.ExecuteNonQuery();
 
-            conexao.Close();
+                conexao.Close();
+            }
+
+            static bool VenderProduto(int id, int quantidade, Filme filme)
+            {
+                MySqlConnection conexao = Conexao();
+                MySqlCommand comando = new MySqlCommand(filme.UpdateStockFilme(), conexao);
+
+                comando.Parameters.AddWithValue("@Quantidade", quantidade);
+                comando.Parameters.AddWithValue("@Id", id);
+
+                int linhasAfetadas = comando.ExecuteNonQuery();
+                bool resultBool = linhasAfetadas > 0;
+
+                conexao.Close();
+                return resultBool;
+            }
+
+            static bool VenderProduto(int id, int quantidade, Livro livro)
+            {
+                MySqlConnection conexao = Conexao();
+                MySqlCommand comando = new MySqlCommand(livro.UpdateStockLivro(), conexao);
+
+                comando.Parameters.AddWithValue("@Quantidade", quantidade);
+                comando.Parameters.AddWithValue("@Id", id);
+
+                int linhasAfetadas = comando.ExecuteNonQuery();
+                bool resultBool = linhasAfetadas > 0;
+
+                conexao.Close();
+                return resultBool;
+            }
         }
-
-        static bool VenderProduto(int id, int quantidade, Filme filme)
-        {
-            MySqlConnection conexao = Conexao();
-            MySqlCommand comando = new MySqlCommand(filme.UpdateStockFilme(), conexao);
-
-            comando.Parameters.AddWithValue("@Quantidade", quantidade);
-            comando.Parameters.AddWithValue("@Id", id);
-
-            int linhasAfetadas = comando.ExecuteNonQuery();
-            bool resultBool = linhasAfetadas > 0;
-
-            conexao.Close();
-            return resultBool;
-        }
-
-        static bool VenderProduto(int id, int quantidade, Livro livro)
-        {
-            MySqlConnection conexao = Conexao();
-            MySqlCommand comando = new MySqlCommand(livro.UpdateStockLivro(), conexao);
-
-            comando.Parameters.AddWithValue("@Quantidade", quantidade);
-            comando.Parameters.AddWithValue("@Id", id);
-
-            int linhasAfetadas = comando.ExecuteNonQuery();
-            bool resultBool = linhasAfetadas > 0;
-
-            conexao.Close();
-            return resultBool;
-        }                    
     }
-}
+
