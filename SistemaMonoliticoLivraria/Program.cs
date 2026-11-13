@@ -23,6 +23,8 @@ namespace SistemaMonoliticoLivraria
 
             CriarBancoETabelas();
 
+            VerificarDadosIniciais();
+
             List<Venda> listaDeVendas = new List<Venda>();
             List<Filme> listaDeFilmes = new List<Filme>();
             List<Livro> listaDeLivros = new List<Livro>();
@@ -116,6 +118,7 @@ namespace SistemaMonoliticoLivraria
         ///                                             CAMADA DE DADOS                                                   ///
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+        
         struct Venda
         {
             public int Id;
@@ -166,11 +169,11 @@ namespace SistemaMonoliticoLivraria
                 Console.WriteLine("===============================================================");                             
                 Console.WriteLine($"Produto: {Produto}");
                 Console.WriteLine($"Tipo de Produto: {TipoProduto}");
-                Console.WriteLine($"Preço: {Preco:C}");
+                Console.WriteLine($"Preço: {Preco.ToString("C", CultureInfo.GetCultureInfo("pt-BR"))}");
                 Console.WriteLine($"Quantidade Vendida: {QuantidadeVendida}");
-                Console.WriteLine($"Total da Venda: {TotalVenda:C}");
-                Console.WriteLine($"Data da Venda: {DataVenda}");
-                Console.WriteLine($"Hora da Venda: {HoraVenda}");
+                Console.WriteLine($"Total da Venda: {TotalVenda.ToString("C", CultureInfo.GetCultureInfo("pt-BR"))}");
+                Console.WriteLine($"Data da Venda: {DataVenda:dd/MM/yyyy}");
+                Console.WriteLine($"Hora da Venda: {HoraVenda:hh\\:mm\\:ss}");
                 Console.WriteLine("===============================================================");
             }
         }
@@ -975,6 +978,28 @@ namespace SistemaMonoliticoLivraria
 
                     MySqlCommand comando = new MySqlCommand(sqlTabelas, conexao);
                     comando.ExecuteNonQuery();
+                }
+            }
+
+        static void VerificarDadosIniciais()
+            {
+                using (MySqlConnection conexao = Conexao())
+                {
+                    string sql = @"
+                        SELECT
+                            (SELECT COUNT(*) FROM filmes) +
+                            (SELECT COUNT(*) FROM livros) +
+                            (SELECT COUNT(*) FROM vendas) AS Total;
+                    ";
+            
+                    MySqlCommand comando = new MySqlCommand(sql, conexao);
+            
+                    int total = Convert.ToInt32(comando.ExecuteScalar());
+            
+                    if (total == 0)
+                    {
+                        InsertDadosTxt();
+                    }
                 }
             }
 
