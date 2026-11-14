@@ -1,5 +1,0 @@
-Dom Casmurro;Romance;Machado de Assis;29.90;12
-O Hobbit;Fantasia;J. R. R. Tolkien;39.90;9
-1984;Ficcao;George Orwell;34.50;10
-Capitaes da Areia;Romance;Jorge Amado;27.00;8
-Uma Breve Historia do Tempo;Divulgacao Cientifica;Stephen Hawking;45.00;5

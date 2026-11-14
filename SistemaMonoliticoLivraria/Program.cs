@@ -22,7 +22,6 @@ namespace SistemaMonoliticoLivraria
         {
 
             CriarBancoETabelas();
-
             VerificarDadosIniciais();
 
             List<Venda> listaDeVendas = new List<Venda>();
@@ -48,12 +47,11 @@ namespace SistemaMonoliticoLivraria
                 Console.WriteLine("=                    Bem-vindo ao PlotSys!                    =");
                 Console.WriteLine("===============================================================");
                 Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine("= 1 - Criar Banco e Inserir Dados                             =");
-                Console.WriteLine("= 2 - Cadastrar Produto                                       =");
-                Console.WriteLine("= 3 - Realizar Venda                                          =");
-                Console.WriteLine("= 4 - Consultar / Excluir Produto                             =");
-                Console.WriteLine("= 5 - Imprimir Estoque                                        =");
-                Console.WriteLine("= 6 - Imprimir Relatório de Vendas                            =");
+                Console.WriteLine("= 1 - Cadastrar Produto                                       =");
+                Console.WriteLine("= 2 - Realizar Venda                                          =");
+                Console.WriteLine("= 3 - Consultar / Excluir Produto                             =");
+                Console.WriteLine("= 4 - Imprimir Estoque / Adicionar Estoque                    =");
+                Console.WriteLine("= 5 - Imprimir Relatório de Vendas                            =");
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("= 0 - Sair                                                    =");
                 Console.ForegroundColor = ConsoleColor.White;
@@ -74,23 +72,20 @@ namespace SistemaMonoliticoLivraria
                     opcao = -1; // Define uma opção inválida para continuar o loop
                 }
                 switch (opcao)
-                {
+                {                   
                     case 1:
-                        CriarBancoLocadoraETabelas();
-                        break;
-                    case 2:
                         CadastrarProduto(listaDeFilmes, listaDeLivros);
                         break;
-                    case 3:
+                    case 2:
                         RealizarVenda(venda, listaDeVendas, listaDeFilmes, listaDeLivros);
                         break;
-                    case 4:
+                    case 3:
                         ConsultarExcluirProduto(listaDeFilmes, listaDeLivros);
                         break;
-                    case 5:
-                        ImprimirEstoque(listaDeFilmes, listaDeLivros);
+                    case 4:
+                        ImprimirAdicionarEstoque(listaDeFilmes, listaDeLivros);
                         break;
-                    case 6:
+                    case 5:
                         ImprimirRelatorioVendas(listaDeVendas);
                         break;
                     case 0:
@@ -141,14 +136,14 @@ namespace SistemaMonoliticoLivraria
                 DataVenda = DateTime.Now;
                 HoraVenda = DateTime.Now.TimeOfDay;
             }
-            public Venda(string produto, string tipoProduto, double preco, int quantidadeVendida, DateTime dataVenda, TimeSpan horaVenda)
+            public Venda(string produto, string tipoProduto, double preco, int quantidadeVendida, double totalVenda, DateTime dataVenda, TimeSpan horaVenda)
             {
                 Id = 0;
                 Produto = produto;
                 TipoProduto = tipoProduto;
                 Preco = preco;
                 QuantidadeVendida = quantidadeVendida;
-                TotalVenda = preco * quantidadeVendida;
+                TotalVenda = totalVenda;
                 DataVenda = dataVenda;
                 HoraVenda = horaVenda;
             }
@@ -203,6 +198,11 @@ namespace SistemaMonoliticoLivraria
                 QuantidadeEstoque -= valor;
             }
 
+            public void AdicionarEstoque(int valor)
+            {
+                QuantidadeEstoque += valor;
+            }
+
             public string InsertFilme()
             {
                 string sql =
@@ -224,7 +224,7 @@ namespace SistemaMonoliticoLivraria
                 string sql =
                     "UPDATE filmes " +
                     "SET QuantidadeEstoque = QuantidadeEstoque - @Quantidade " +
-                    "WHERE Id = @Id" +
+                    "WHERE Id = @Id " +
                     "AND QuantidadeEstoque >= @Quantidade";
                 return sql;
 
@@ -276,7 +276,10 @@ namespace SistemaMonoliticoLivraria
             {
                 QuantidadeEstoque -= valor;
             }
-
+            public void AdicionarEstoque(int valor)
+            {
+                QuantidadeEstoque += valor;
+            }
             public string InsertLivro()
             {
                 string sql =
@@ -297,7 +300,7 @@ namespace SistemaMonoliticoLivraria
                 string sql =
                     "UPDATE livros " +
                     "SET QuantidadeEstoque = QuantidadeEstoque - @Quantidade " +
-                    "WHERE Id = @Id" +
+                    "WHERE Id = @Id " +
                     "AND QuantidadeEstoque >= @Quantidade";
                 return sql;
 
@@ -357,6 +360,7 @@ namespace SistemaMonoliticoLivraria
             catch (FormatException)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("===============================================================");
                 Console.WriteLine("Opção inválida. Tente novamente.");
                 Console.WriteLine("===============================================================");
                 Console.ResetColor();
@@ -377,10 +381,10 @@ namespace SistemaMonoliticoLivraria
                 livro.Genero = Console.ReadLine();
                 Console.Write("Digite o autor do livro: ");
                 livro.Autor = Console.ReadLine();
-                Console.Write("Digite o preço do livro: ");
+                Console.Write("Digite o preço do livro: R$");
                 try
                 {
-                    livro.Preco = double.Parse(Console.ReadLine());
+                    livro.Preco = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
                     if (livro.Preco < 0)
                     {
                         throw new FormatException();
@@ -389,6 +393,7 @@ namespace SistemaMonoliticoLivraria
                 catch (FormatException)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("===============================================================");
                     Console.WriteLine("Não é possível cadastrar preço negativo. Tente novamente.");
                     Console.WriteLine("===============================================================");
                     Console.ResetColor();
@@ -406,6 +411,7 @@ namespace SistemaMonoliticoLivraria
                 catch (FormatException)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("===============================================================");
                     Console.WriteLine("Não é possível inserir estoque negativo. Tente novamente.");
                     Console.WriteLine("===============================================================");
                     Console.ResetColor();
@@ -415,6 +421,11 @@ namespace SistemaMonoliticoLivraria
 
                 InserirProduto(livro);
                 listaDeLivros.Add(livro);
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("===============================================================");
+                Console.WriteLine("LIVRO CADASTRADO COM SUCESSO.");
+                Console.WriteLine("===============================================================");
             }
             else
             {
@@ -430,10 +441,10 @@ namespace SistemaMonoliticoLivraria
                 filme.Genero = Console.ReadLine();
                 Console.Write("Digite o diretor do filme: ");
                 filme.Diretor = Console.ReadLine();
-                Console.Write("Digite o preço do filme: ");
+                Console.Write("Digite o preço do filme: R$");
                 try
                 {
-                    filme.Preco = double.Parse(Console.ReadLine());
+                    filme.Preco = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
                     if (filme.Preco < 0)
                     {
                         throw new FormatException();
@@ -442,6 +453,7 @@ namespace SistemaMonoliticoLivraria
                 catch (FormatException)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("===============================================================");
                     Console.WriteLine("Não é possível cadastrar preço negativo. Tente novamente.");
                     Console.WriteLine("===============================================================");
                     Console.ResetColor();
@@ -459,6 +471,7 @@ namespace SistemaMonoliticoLivraria
                 catch (FormatException)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("===============================================================");
                     Console.WriteLine("Não é possível inserir estoque negativo. Tente novamente.");
                     Console.WriteLine("===============================================================");
                     Console.ResetColor();
@@ -466,6 +479,11 @@ namespace SistemaMonoliticoLivraria
                 }
                 InserirProduto(filme);
                 listaDeFilmes.Add(filme);
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("===============================================================");
+                Console.WriteLine("FILME CADASTRADO COM SUCESSO.");
+                Console.WriteLine("===============================================================");
             }
         }
 
@@ -497,6 +515,7 @@ namespace SistemaMonoliticoLivraria
             catch (FormatException)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("===============================================================");
                 Console.WriteLine("Opção inválida. Tente novamente.");
                 Console.WriteLine("===============================================================");
                 Console.ResetColor();
@@ -505,6 +524,7 @@ namespace SistemaMonoliticoLivraria
 
             if (opcaoMenuPrincipalVenda == 1)
             {
+                Console.WriteLine("===============================================================");
                 Console.WriteLine("Digite o título do livro a ser vendido. ");
                 Console.Write("Título: ");
                 string tituloVenda = Console.ReadLine().ToLower();
@@ -534,6 +554,7 @@ namespace SistemaMonoliticoLivraria
                         catch (FormatException)
                         {
                             Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("===============================================================");
                             Console.WriteLine("Opção inválida. Tente novamente.");
                             Console.WriteLine("===============================================================");
                             Console.ResetColor();
@@ -542,7 +563,9 @@ namespace SistemaMonoliticoLivraria
 
                         if (opcaoMenuConfirmarVendaLivro == 1)
                         {
+                            Console.WriteLine("===============================================================");
                             Console.WriteLine("Digite a quantidade de unidades a serem vendidas: ");
+                            Console.Write("Quantidade: ");
                             int quantidadeVendas = int.Parse(Console.ReadLine());
 
                             if (quantidadeVendas <= listaDeLivros[i].QuantidadeEstoque)
@@ -552,6 +575,7 @@ namespace SistemaMonoliticoLivraria
                             else
                             {
                                 Console.ForegroundColor = ConsoleColor.Red;
+                                Console.WriteLine("===============================================================");
                                 Console.WriteLine("Quantidade insuficiente em estoque.");
                                 Console.WriteLine("===============================================================");
                                 return;
@@ -568,20 +592,30 @@ namespace SistemaMonoliticoLivraria
                             VenderProduto(livro.Id, quantidadeVendas, livro);
                             InserirVenda(venda);
                             listaDeVendas.Add(venda);
+                            listaDeLivros[i].AlterarEstoque(quantidadeVendas);
 
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine("===============================================================");
+                            Console.WriteLine("VENDA REALIZADA COM SUCESSO.");
+                            Console.WriteLine("===============================================================");
+
+                            CarregarDados(listaDeFilmes, listaDeLivros, listaDeVendas);
+                            break;
                         }
                         else
                         {
                             Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("===============================================================");
                             Console.WriteLine("VENDA CANCELADA.");
                             Console.WriteLine("===============================================================");
                         }
                     }
                 }
+       
             }
             else
             {
-
+                Console.WriteLine("===============================================================");
                 Console.WriteLine("Digite o título do filme a ser vendido. ");
                 Console.Write("Título: ");
                 string tituloVenda = Console.ReadLine().ToLower();
@@ -613,6 +647,7 @@ namespace SistemaMonoliticoLivraria
                         catch (FormatException)
                         {
                             Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("===============================================================");
                             Console.WriteLine("Opção inválida. Tente novamente.");
                             Console.WriteLine("===============================================================");
                             Console.ResetColor();
@@ -630,6 +665,7 @@ namespace SistemaMonoliticoLivraria
                             else
                             {
                                 Console.ForegroundColor = ConsoleColor.Red;
+                                Console.WriteLine("===============================================================");
                                 Console.WriteLine("Quantidade insuficiente em estoque.");
                                 Console.WriteLine("===============================================================");
                                 return;
@@ -647,17 +683,28 @@ namespace SistemaMonoliticoLivraria
                             VenderProduto(filme.Id, quantidadeVendas, filme);
                             InserirVenda(venda);
                             listaDeVendas.Add(venda);
+                            listaDeFilmes[i].AlterarEstoque(quantidadeVendas);
+                            
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine("===============================================================");
+                            Console.WriteLine("VENDA REALIZADA COM SUCESSO.");
+                            Console.WriteLine("===============================================================");
+
+                            CarregarDados(listaDeFilmes, listaDeLivros, listaDeVendas);
+                            break;
 
                         }
                         else
                         {
                             Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("===============================================================");
                             Console.WriteLine("VENDA CANCELADA.");
                             Console.WriteLine("===============================================================");
                         }
                         
                     }
                 }
+                
             }
         }
 
@@ -688,8 +735,10 @@ namespace SistemaMonoliticoLivraria
             }
             catch (FormatException)
             {
+                Console.WriteLine("===============================================================");
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Opção inválida. Tente novamente.");
+                Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.WriteLine("===============================================================");
                 Console.ResetColor();
                 return; 
@@ -699,6 +748,8 @@ namespace SistemaMonoliticoLivraria
             {
                 bool livroEncontrado = false;
 
+                Console.Clear();
+                Console.WriteLine("===============================================================");
                 Console.WriteLine("Digite o título do livro a ser consultado/excluído: ");
                 Console.Write("Título: ");
                 string tituloConsulta = Console.ReadLine().ToLower();
@@ -708,6 +759,7 @@ namespace SistemaMonoliticoLivraria
                 {
                     if (listaDeLivros[i].Titulo.ToLower() == tituloConsulta.ToLower())
                     {
+                        livroEncontrado = true;
                         Console.ForegroundColor = ConsoleColor.Cyan;
                         Console.WriteLine("INFORMAÇÕES DO LIVRO:");
                         Console.ForegroundColor = ConsoleColor.White;
@@ -726,8 +778,10 @@ namespace SistemaMonoliticoLivraria
                         }
                         catch (FormatException)
                         {
+                            Console.WriteLine("===============================================================");
                             Console.ForegroundColor = ConsoleColor.Red;
                             Console.WriteLine("Opção inválida. Tente novamente.");
+                            Console.ForegroundColor = ConsoleColor.Cyan;
                             Console.WriteLine("===============================================================");
                             Console.ResetColor();
                             return;
@@ -737,37 +791,41 @@ namespace SistemaMonoliticoLivraria
                         {
                             ExcluirProduto("livros", listaDeLivros[i].Id);
                             listaDeLivros.RemoveAt(i);
+                            Console.WriteLine("===============================================================");
                             Console.ForegroundColor = ConsoleColor.Green;
                             Console.WriteLine("LIVRO EXCLUÍDO COM SUCESSO.");
+                            Console.ForegroundColor = ConsoleColor.Cyan;
                             Console.WriteLine("===============================================================");
                         }
                         else
                         {
+                            Console.WriteLine("===============================================================");
                             Console.ForegroundColor = ConsoleColor.Red;
                             Console.WriteLine("EXCLUSÃO CANCELADA.");
+                            Console.ForegroundColor = ConsoleColor.Cyan;
                             Console.WriteLine("===============================================================");
                         }
 
-                        livroEncontrado = true;
-                    }
-                    else
-                    {
-                        livroEncontrado = false;
-                    }
+                        break;
+                    }                  
 
                 }
 
                 if (!livroEncontrado)
                 {
+                    Console.WriteLine("===============================================================");
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("LIVRO NÃO ENCONTRADO.");
+                    Console.ForegroundColor = ConsoleColor.Cyan;
                     Console.WriteLine("===============================================================");
                 }
 
             }
             else
             {
+                Console.Clear();
                 Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine("===============================================================");
                 Console.WriteLine("Digite o título do filme a ser consultado/excluído: ");
                 Console.Write("Título: ");
                 string tituloConsulta = Console.ReadLine();
@@ -779,6 +837,7 @@ namespace SistemaMonoliticoLivraria
                 {
                     if (listaDeFilmes[i].Titulo.ToLower() == tituloConsulta.ToLower())
                     {
+                        filmeEncontrado = true;
                         Console.ForegroundColor = ConsoleColor.Cyan;
                         Console.WriteLine("INFORMAÇÕES DO FILME:");
                         Console.ForegroundColor = ConsoleColor.White;
@@ -797,8 +856,10 @@ namespace SistemaMonoliticoLivraria
                         }
                         catch (FormatException)
                         {
+                            Console.WriteLine("===============================================================");
                             Console.ForegroundColor = ConsoleColor.Red;
                             Console.WriteLine("Opção inválida. Tente novamente.");
+                            Console.ForegroundColor = ConsoleColor.Cyan;
                             Console.WriteLine("===============================================================");
                             Console.ResetColor();
                             return;
@@ -808,52 +869,81 @@ namespace SistemaMonoliticoLivraria
                         {
                             ExcluirProduto("filmes", listaDeFilmes[i].Id);
                             listaDeFilmes.RemoveAt(i);
+                            Console.WriteLine("===============================================================");
                             Console.ForegroundColor = ConsoleColor.Green;
                             Console.WriteLine("FILME EXCLUÍDO COM SUCESSO.");
+                            Console.ForegroundColor = ConsoleColor.Cyan;
                             Console.WriteLine("===============================================================");
                         }
                         else
                         {
+                            Console.WriteLine("===============================================================");
                             Console.ForegroundColor = ConsoleColor.Red;
                             Console.WriteLine("EXCLUSÃO CANCELADA.");
+                            Console.ForegroundColor = ConsoleColor.Cyan;
                             Console.WriteLine("===============================================================");
-                        }
+                        }                                             
 
-                        filmeEncontrado = true;
-                    }
-                    else
-                    {
-                        filmeEncontrado = false;
-                    }
+                        break;
+                    }                    
                 }
 
                 if (!filmeEncontrado)
                 {
+                    Console.WriteLine("===============================================================");
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("FILME NÃO ENCONTRADO.");
+                    Console.ForegroundColor = ConsoleColor.Cyan;
                     Console.WriteLine("===============================================================");
                 }
             }
         }
 
-            static void ImprimirEstoque(List<Filme> listaDeFilmes, List<Livro> listaDeLivros)
+            static void ImprimirAdicionarEstoque(List<Filme> listaDeFilmes, List<Livro> listaDeLivros)
             {
+            int opcaoMenuPrincipal;
+            int opcaoMenuEstoque;
+            
+
                 Console.Clear();
                 Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine("===============================================================");
-                Console.WriteLine("=                     Imprimir Estoque                        =");
-                Console.WriteLine("===============================================================");
+                Console.WriteLine("================================================================");
+                Console.WriteLine("=                 Imprimir / Adicionar Estoque                 =");
+                Console.WriteLine("================================================================");
+                Console.WriteLine("Digite 1 para imprimir o estoque ou 2 para adicionar ao estoque:");
+                try
+                {
+                    opcaoMenuPrincipal = int.Parse(Console.ReadLine());
+                    if (opcaoMenuPrincipal != 1 && opcaoMenuPrincipal != 2)
+                    {
+                        throw new FormatException();
+                    }
+
+                }
+                catch (FormatException)
+                {
+                    Console.WriteLine("===============================================================");
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Opção inválida. Tente novamente.");
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.WriteLine("===============================================================");
+                    Console.ResetColor();
+                    return;
+                }
+
+            if (opcaoMenuPrincipal == 1)
+            {
                 Console.ForegroundColor = ConsoleColor.DarkYellow;
                 Console.WriteLine("Estoque de filmes: ");
                 Console.ForegroundColor = ConsoleColor.Cyan;
-            foreach (var filmes in listaDeFilmes)
+                foreach (var filmes in listaDeFilmes)
                 {
                     filmes.ExibirEstoque();
                 }
 
                 Console.WriteLine("===============================================================");
                 Console.ForegroundColor = ConsoleColor.DarkYellow;
-            Console.WriteLine("Estoque de livros: ");
+                Console.WriteLine("Estoque de livros: ");
                 Console.ForegroundColor = ConsoleColor.White;
                 foreach (var livros in listaDeLivros)
                 {
@@ -861,63 +951,184 @@ namespace SistemaMonoliticoLivraria
                 }
 
                 Console.WriteLine("===============================================================");
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("===============================================================");
+                Console.WriteLine("Digite 1 para alterar estoque de um livro" +
+                                "\nDigite 2 para alterar estoque de um filme: ");
+                Console.WriteLine("===============================================================");
 
+                try
+                {
+                    opcaoMenuEstoque = int.Parse(Console.ReadLine());
+                    if (opcaoMenuEstoque != 1 && opcaoMenuEstoque != 2)
+                    {
+                        throw new FormatException();
+                    }
+
+                }
+                catch (FormatException)
+                {
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.WriteLine("===============================================================");
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Opção inválida. Tente novamente.");
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.WriteLine("===============================================================");
+                    Console.ResetColor();
+                    return;
+                }
+
+
+                if (opcaoMenuEstoque == 1)
+                {
+                    string tituloConsulta;
+                    bool livroEncontrado = false;
+                    int valorAdicional;
+
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.WriteLine("===============================================================");
+                    Console.Write("Digite o nome do livro: ");
+                    tituloConsulta = Console.ReadLine();
+
+                    for (int i = 0; i < listaDeLivros.Count; i++)
+                    {
+                        if (listaDeLivros[i].Titulo.ToLower() == tituloConsulta.ToLower())
+                        {
+                            livroEncontrado = true;
+                            Console.ForegroundColor = ConsoleColor.Cyan;
+                            Console.WriteLine("INFORMAÇÕES DO LIVRO:");
+                            Console.ForegroundColor = ConsoleColor.White;
+                            listaDeLivros[i].ExibirTodasInformacoes();
+                            
+                            Console.WriteLine("===============================================================");
+                            Console.Write("Digite o valor a adicionar no estoque: ");
+                            
+                            try
+                            {
+                                valorAdicional = int.Parse(Console.ReadLine());
+                                if (valorAdicional < 0)
+                                {
+                                    new FormatException();
+                                }
+                            }
+                            catch (FormatException)
+                            {
+                                Console.ForegroundColor = ConsoleColor.Cyan;
+                                Console.WriteLine("===============================================================");
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.WriteLine("Não é possível adicionar valor menor que zero ao estoque!");
+                                Console.ForegroundColor = ConsoleColor.Cyan;
+                                Console.WriteLine("===============================================================");
+                                Console.ResetColor();
+                                return;
+                            }
+
+                            listaDeLivros[i].AdicionarEstoque(valorAdicional);
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine("===============================================================");
+                            Console.WriteLine("Estoque alterado com sucesso!");
+                            Console.WriteLine("===============================================================");
+
+                            break;
+                        }
+
+                    }
+                    if (!livroEncontrado)
+                    {
+                        Console.WriteLine("===============================================================");
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("FILME NÃO ENCONTRADO.");
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.WriteLine("===============================================================");
+                    }
+                }
+                else
+                {
+                    string tituloConsulta;
+                    bool filmeEncontrado = false;
+                    int valorAdicional;
+
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.WriteLine("===============================================================");
+                    Console.Write("Digite o nome do Filme: ");
+                    tituloConsulta = Console.ReadLine();
+
+                    for (int i = 0; i < listaDeFilmes.Count; i++)
+                    {
+                        if (listaDeFilmes[i].Titulo.ToLower() == tituloConsulta.ToLower())
+                        {
+                            filmeEncontrado = true;
+                            Console.ForegroundColor = ConsoleColor.Cyan;
+                            Console.WriteLine("INFORMAÇÕES DO FILME:");
+                            Console.ForegroundColor = ConsoleColor.White;
+                            listaDeFilmes[i].ExibirTodasInformacoes();
+
+                            Console.WriteLine("===============================================================");
+                            Console.Write("Digite o valor a adicionar no estoque: ");
+
+                            try
+                            {
+                                valorAdicional = int.Parse(Console.ReadLine());
+                                if (valorAdicional < 0)
+                                {
+                                    new FormatException();
+                                }
+                            }
+                            catch (FormatException)
+                            {
+                                Console.ForegroundColor = ConsoleColor.Cyan;
+                                Console.WriteLine("===============================================================");
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.WriteLine("Não é possível adicionar valor menor que zero ao estoque!");
+                                Console.ForegroundColor = ConsoleColor.Cyan;
+                                Console.WriteLine("===============================================================");
+                                Console.ResetColor();
+                                return;
+                            }
+
+                            listaDeLivros[i].AdicionarEstoque(valorAdicional);
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine("===============================================================");
+                            Console.WriteLine("Estoque alterado com sucesso!");
+                            Console.WriteLine("===============================================================");
+
+                            break;
+                        }
+
+                    }
+                    if (!filmeEncontrado)
+                    {
+                        Console.WriteLine("===============================================================");
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("FILME NÃO ENCONTRADO.");
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.WriteLine("===============================================================");
+                    }
+                }                          
+
+
+            }
             }
 
             static void ImprimirRelatorioVendas(List<Venda> listaDeVendas)
             {
-                foreach (var vendas in listaDeVendas)
+                Console.Clear();
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine("===============================================================");
+                Console.WriteLine("=                     Relatório de Vendas                    =");
+                Console.WriteLine("===============================================================");
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+
+            foreach (var vendas in listaDeVendas)
                 {
                     vendas.ExibirInformacoesVenda();
                 }
             }
 
-            static void CriarBancoLocadoraETabelas()
-            {
-                bool repetirMenu = true;
-
-            do
-            {
-                Console.Clear();
-                Console.ForegroundColor = ConsoleColor.DarkGray;
-                Console.WriteLine("===============================================================");
-                Console.WriteLine("=           CRIAR BANCO DE DADOS E INSEÇÃO DE DADOS           =");
-                Console.WriteLine("===============================================================");
-                Console.WriteLine("= Digite 1 para criar o banco de dados e tabelas.             =" +
-                                "\n= Digite 2 para inserir dados dos arquivos .txt.              =" +
-                                "\n= Digite 0 para sair.                                         =");
-                Console.WriteLine("===============================================================");
-
-                int opcao = int.Parse(Console.ReadLine());
-
-                if (opcao == 1)
-                {
-                    CriarBancoETabelas();
-                    Console.WriteLine("===============================================================");
-                    Console.ForegroundColor = ConsoleColor.DarkGreen;
-                    Console.WriteLine("= BANCO DE DADOS E TABELAS CRIADOS COM SUCESSO.               =");
-                    Console.ForegroundColor = ConsoleColor.DarkGray;
-                    Console.WriteLine("===============================================================");
-                }
-                else if (opcao == 2)
-                {
-                    InsertDadosTxt();
-                    Console.WriteLine("===============================================================");
-                    Console.ForegroundColor = ConsoleColor.DarkGreen;
-                    Console.WriteLine("= DADOS INSERIDOS COM SUCESSO.                                =");
-                    Console.ForegroundColor = ConsoleColor.DarkGray;
-                    Console.WriteLine("===============================================================");
-                }
-                else if (opcao == 0)
-                {
-                    repetirMenu = false;
-                }
-            }
-            while (repetirMenu);
-            
-            
-
-            }
+     
 
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ///                                             CAMADA DE PERSISTÊNCIA                                            ///
@@ -1009,40 +1220,40 @@ namespace SistemaMonoliticoLivraria
                 string caminhoArquivoLivros = Path.Combine(AppContext.BaseDirectory, "dadosLivros.txt");
                 string caminhoArquivoVendas = Path.Combine(AppContext.BaseDirectory, "dadosVendas.txt");
 
-            if (File.Exists(caminhoArquivoFilmes))
-            {
-                string[] linhasFilmes = File.ReadAllLines(caminhoArquivoFilmes);
-                foreach (string linha in linhasFilmes)
+                if (File.Exists(caminhoArquivoFilmes))
                 {
-                    string[] dados = linha.Split(';');
-                    Filme filme = new Filme(dados[0], dados[1], dados[2], double.Parse(dados[3]), int.Parse(dados[4]));
+                    string[] linhasFilmes = File.ReadAllLines(caminhoArquivoFilmes);
+                    foreach (string linha in linhasFilmes)
+                    {
+                        string[] dados = linha.Split(';');
+                        Filme filme = new Filme(dados[0], dados[1], dados[2], double.Parse(dados[3], CultureInfo.InvariantCulture), int.Parse(dados[4]));
 
-                    InserirProduto(filme);
+                        InserirProduto(filme);
 
+                    }
                 }
-            }
 
-            if (File.Exists(caminhoArquivoLivros))
-            {
-                string[] linhasLivros = File.ReadAllLines(caminhoArquivoLivros);
-                foreach (string linha in linhasLivros)
+                if (File.Exists(caminhoArquivoLivros))
                 {
-                    string[] dados = linha.Split(';');
-                    Livro livro = new Livro(dados[0], dados[1], dados[2], double.Parse(dados[3]), int.Parse(dados[4]));
-                    InserirProduto(livro);
+                    string[] linhasLivros = File.ReadAllLines(caminhoArquivoLivros);
+                    foreach (string linha in linhasLivros)
+                    {
+                        string[] dados = linha.Split(';');
+                        Livro livro = new Livro(dados[0], dados[1], dados[2], double.Parse(dados[3], CultureInfo.InvariantCulture), int.Parse(dados[4]));
+                        InserirProduto(livro);
+                    }
                 }
-            }
 
                 if (File.Exists(caminhoArquivoVendas))
                 {
                     string[] linhasVendas = File.ReadAllLines(caminhoArquivoVendas);
-                foreach (string linha in linhasVendas)
-                {
-                    string[] dados = linha.Split(';');
-                    Venda venda = new Venda(dados[0], dados[1], double.Parse(dados[2]), int.Parse(dados[3]), DateTime.Parse(dados[4]), TimeSpan.Parse(dados[5]));
-                    InserirVenda(venda);
+                    foreach (string linha in linhasVendas)
+                    {
+                        string[] dados = linha.Split(';');
+                        Venda venda = new Venda(dados[0], dados[1], double.Parse(dados[2], CultureInfo.InvariantCulture), int.Parse(dados[3]), double.Parse(dados[4], CultureInfo.InvariantCulture), DateTime.Parse(dados[5]), TimeSpan.Parse(dados[6]));
+                        InserirVenda(venda);
 
-                }
+                    }
                 }
 
             }
