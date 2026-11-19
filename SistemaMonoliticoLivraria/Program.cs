@@ -128,7 +128,7 @@ namespace SistemaMonoliticoLivraria
             public int? IdLivro;
             public int? IdFilme;
 
-            public Venda(string produto, string tipoProduto, double preco, int quantidadeVendida)
+            public Venda(int idProduto, string produto, string tipoProduto, double preco, int quantidadeVendida)
             {
                 Id = 0;                
                 Produto = produto;
@@ -138,10 +138,18 @@ namespace SistemaMonoliticoLivraria
                 TotalVenda = preco * quantidadeVendida;
                 DataVenda = DateTime.Now;
                 HoraVenda = DateTime.Now.TimeOfDay;
-                IdLivro = null;
-                IdFilme = null;
+                if (tipoProduto == "Filme")
+                {
+                    IdLivro = null;
+                    IdFilme = idProduto;
+                }
+                else
+                {
+                    IdLivro = idProduto;
+                    IdFilme = null;
+                }
             }
-            public Venda(string produto, string tipoProduto, double preco, int quantidadeVendida, double totalVenda, DateTime dataVenda, TimeSpan horaVenda)
+            public Venda(int idProduto, string produto, string tipoProduto, double preco, int quantidadeVendida, double totalVenda, DateTime dataVenda, TimeSpan horaVenda)
             {
                 Id = 0;
                 Produto = produto;
@@ -151,8 +159,16 @@ namespace SistemaMonoliticoLivraria
                 TotalVenda = totalVenda;
                 DataVenda = dataVenda;
                 HoraVenda = horaVenda;
-                IdLivro = null;
-                IdFilme = null;
+
+                if (tipoProduto == "Filme")
+                {
+                    IdLivro = null;
+                    IdFilme = idProduto;
+                } else
+                {
+                    IdLivro = idProduto;
+                    IdFilme = null;
+                }                
             }
 
             public string InsertVenda()
@@ -1188,21 +1204,18 @@ namespace SistemaMonoliticoLivraria
                     );
 
                 CREATE TABLE IF NOT EXISTS vendas (
-                    Id INT AUTO_INCREMENT PRIMARY KEY,                    
+                    Id INT AUTO_INCREMENT PRIMARY KEY,                     
                     Produto VARCHAR(150) NOT NULL,
                     TipoProduto VARCHAR(50) NOT NULL,
                     Preco DOUBLE NOT NULL,
                     QuantidadeVendida INT NOT NULL,
                     TotalVenda DOUBLE NOT NULL,
                     DataVenda DATE NOT NULL,
-                    HoraVenda TIME NOT NULL
-
+                    HoraVenda TIME NOT NULL,
                     IdLivro INT NULL,
                     IdFilme INT NULL,
-                
                     FOREIGN KEY (IdLivro) REFERENCES livros(Id)
                     ON DELETE SET NULL,
-                
                     FOREIGN KEY (IdFilme) REFERENCES filmes(Id)
                     ON DELETE SET NULL
                     );
@@ -1271,7 +1284,7 @@ namespace SistemaMonoliticoLivraria
                     foreach (string linha in linhasVendas)
                     {
                         string[] dados = linha.Split(';');
-                        Venda venda = new Venda(dados[0], dados[1], double.Parse(dados[2], CultureInfo.InvariantCulture), int.Parse(dados[3]), double.Parse(dados[4], CultureInfo.InvariantCulture), DateTime.Parse(dados[5]), TimeSpan.Parse(dados[6]));
+                        Venda venda = new Venda(int.Parse(dados[0]), dados[1], dados[2], double.Parse(dados[3], CultureInfo.InvariantCulture), int.Parse(dados[4]), double.Parse(dados[5], CultureInfo.InvariantCulture), DateTime.Parse(dados[6]), TimeSpan.Parse(dados[7]));
                         InserirVenda(venda);
 
                     }
@@ -1358,8 +1371,22 @@ namespace SistemaMonoliticoLivraria
                     vendas.TotalVenda = leitor.GetDouble("TotalVenda");
                     vendas.DataVenda = leitor.GetDateTime("DataVenda");
                     vendas.HoraVenda = leitor.GetTimeSpan("HoraVenda");
-                    vendas.IdLivro = leitor.IsDBNull(leitor.GetOrdinal("IdLivro")) ? null : leitor.GetInt32("IdLivro");
-                    vendas.IdFilme = leitor.IsDBNull(leitor.GetOrdinal("IdFilme")) ? null : leitor.GetInt32("IdFilme");
+                    if (leitor.IsDBNull(leitor.GetOrdinal("IdLivro")))
+                    {
+                        vendas.IdLivro = null;
+                    }
+                    else
+                    {
+                        vendas.IdLivro = leitor.GetInt32("IdLivro");
+                    }
+                    if (leitor.IsDBNull(leitor.GetOrdinal("IdFilme")))
+                    {
+                        vendas.IdFilme = null;
+                    }
+                    else
+                    {
+                        vendas.IdFilme = leitor.GetInt32("IdFilme");
+                    }
 
                     listaDeVendas.Add(vendas);
                 }
