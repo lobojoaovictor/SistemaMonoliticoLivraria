@@ -124,6 +124,9 @@ namespace SistemaMonoliticoLivraria
             public double TotalVenda;
             public DateTime DataVenda;
             public TimeSpan HoraVenda;
+            
+            public int? IdLivro;
+            public int? IdFilme;
 
             public Venda(string produto, string tipoProduto, double preco, int quantidadeVendida)
             {
@@ -135,6 +138,8 @@ namespace SistemaMonoliticoLivraria
                 TotalVenda = preco * quantidadeVendida;
                 DataVenda = DateTime.Now;
                 HoraVenda = DateTime.Now.TimeOfDay;
+                IdLivro = null;
+                IdFilme = null;
             }
             public Venda(string produto, string tipoProduto, double preco, int quantidadeVendida, double totalVenda, DateTime dataVenda, TimeSpan horaVenda)
             {
@@ -146,14 +151,17 @@ namespace SistemaMonoliticoLivraria
                 TotalVenda = totalVenda;
                 DataVenda = dataVenda;
                 HoraVenda = horaVenda;
+                IdLivro = null;
+                IdFilme = null;
             }
 
             public string InsertVenda()
             {
                 string sql =
-                    "INSERT INTO vendas " +
-                    "(Produto, TipoProduto, Preco, QuantidadeVendida, TotalVenda, DataVenda, HoraVenda)" +
-                    "VALUES (@Produto, @TipoProduto, @Preco, @QuantidadeVendida, @TotalVenda, @DataVenda, @HoraVenda);";
+                    @"INSERT INTO vendas
+                    (Produto, TipoProduto, Preco, QuantidadeVendida, TotalVenda, DataVenda, HoraVenda, IdLivro, IdFilme)
+                    VALUES
+                    (@Produto, @TipoProduto, @Preco, @QuantidadeVendida, @TotalVenda, @DataVenda, @HoraVenda, @IdLivro, @IdFilme)";
 
                 return sql;
             }
@@ -583,6 +591,8 @@ namespace SistemaMonoliticoLivraria
 
                             venda.Produto = listaDeLivros[i].Titulo;
                             venda.TipoProduto = "Livro";
+                            venda.IdLivro = listaDeLivros[i].Id;
+                            venda.IdFilme = null;
                             venda.Preco = listaDeLivros[i].Preco;
                             venda.QuantidadeVendida = quantidadeVendas;
                             venda.TotalVenda = venda.Preco * venda.QuantidadeVendida;
@@ -673,6 +683,8 @@ namespace SistemaMonoliticoLivraria
 
                             venda.Produto = listaDeFilmes[i].Titulo;
                             venda.TipoProduto = "Filme";
+                            venda.IdFilme = listaDeFilmes[i].Id;
+                            venda.IdLivro = null;
                             venda.Preco = listaDeFilmes[i].Preco;
                             venda.QuantidadeVendida = quantidadeVendas;
                             venda.TotalVenda = venda.Preco * venda.QuantidadeVendida;
@@ -1184,6 +1196,15 @@ namespace SistemaMonoliticoLivraria
                     TotalVenda DOUBLE NOT NULL,
                     DataVenda DATE NOT NULL,
                     HoraVenda TIME NOT NULL
+
+                    IdLivro INT NULL,
+                    IdFilme INT NULL,
+                
+                    FOREIGN KEY (IdLivro) REFERENCES livros(Id)
+                    ON DELETE SET NULL,
+                
+                    FOREIGN KEY (IdFilme) REFERENCES filmes(Id)
+                    ON DELETE SET NULL
                     );
                     ";
 
@@ -1337,6 +1358,8 @@ namespace SistemaMonoliticoLivraria
                     vendas.TotalVenda = leitor.GetDouble("TotalVenda");
                     vendas.DataVenda = leitor.GetDateTime("DataVenda");
                     vendas.HoraVenda = leitor.GetTimeSpan("HoraVenda");
+                    vendas.IdLivro = leitor.IsDBNull(leitor.GetOrdinal("IdLivro")) ? null : leitor.GetInt32("IdLivro");
+                    vendas.IdFilme = leitor.IsDBNull(leitor.GetOrdinal("IdFilme")) ? null : leitor.GetInt32("IdFilme");
 
                     listaDeVendas.Add(vendas);
                 }
@@ -1410,6 +1433,8 @@ namespace SistemaMonoliticoLivraria
                 comando.Parameters.AddWithValue("@TotalVenda", venda.TotalVenda);
                 comando.Parameters.AddWithValue("@DataVenda", venda.DataVenda);
                 comando.Parameters.AddWithValue("@HoraVenda", venda.HoraVenda);
+                comando.Parameters.AddWithValue("@IdLivro", venda.IdLivro);
+                comando.Parameters.AddWithValue("@IdFilme", venda.IdFilme);
 
 
             int linhasAfetadas = comando.ExecuteNonQuery();
