@@ -153,5 +153,14 @@ namespace SistemaMonoliticoLivraria.Services
                 _menu.ExibirInformacoes(venda);
             }
         }
+        public void ExibirRelatorioCompleto()
+        {
+            List<Venda> listaDeVendas = _vendaRepository.GetAllComJoin();
+        
+            foreach (var venda in listaDeVendas)
+            {
+                _menu.ExibirInformacoes(venda);
+            }
+        }
     }
 }
