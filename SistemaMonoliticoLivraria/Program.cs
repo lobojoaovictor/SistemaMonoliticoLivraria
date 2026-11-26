@@ -334,6 +334,10 @@ namespace SistemaMonoliticoLivraria
             {
                 vendaService.ExibirVendasLivros();
             }
+            else if (opcaoRelatorio == 3)
+            {
+                vendaService.ExibirRelatorioCompleto();
+            }
             else
             {
                 menu.MensagemOpcaoInvalida();
