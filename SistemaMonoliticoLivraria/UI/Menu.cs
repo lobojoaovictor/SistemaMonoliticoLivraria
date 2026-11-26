@@ -559,6 +559,7 @@ namespace SistemaMonoliticoLivraria.UI
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("= 1 - Relatório de Vendas de Filmes                           =");
             Console.WriteLine("= 2 - Relatório de Vendas de Livros                           =");
+            Console.WriteLine("= 3 - Relatório Completo de Vendas                            =");
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("= 0 - Voltar                                                  =");
             Console.ForegroundColor = ConsoleColor.White;
