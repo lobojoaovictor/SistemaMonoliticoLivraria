@@ -27,62 +27,68 @@ namespace SistemaMonoliticoLivraria.Services
             ValidateVenda(venda);
             if (!RemoveStock(venda))
             {
-                throw new ArgumentException("Quantidade em estoque insuficiente.");
-            }
+                _menu.EstoqueInsuficiente();
+                _menu.MensagemSairMenu();
+                return false;
 
-            try
-            {
-                VerifyInsertion(venda);
-                return true;
             }
-            catch
+            else
             {
-                RestoreStock(venda);
-                throw;
-            }
+                try
+                {
+                    VerifyInsertion(venda);
+                    _menu.VendaRealizadaSucesso();
+                    return true;
+                }
+                catch
+                {
+                    RestoreStock(venda);
+                    throw;
+                }
+            }            
         }
 
         public bool VenderPorMenu(List<string> entradas, string tipoProduto)
         {
             if (entradas == null || entradas.Count != 2)
-            {
                 return false;
-            }
 
             string titulo = entradas[0].Trim();
-            if (string.IsNullOrWhiteSpace(titulo))
-            {
-                throw new ArgumentException("O título do produto não pode ser vazio.", nameof(entradas));
-            }
 
-            if (!int.TryParse(entradas[1].Trim(), out int quantidade))
-            {
-                throw new ArgumentException("A quantidade informada é inválida.", nameof(entradas));
-            }
+            if (string.IsNullOrWhiteSpace(titulo))
+                return false;
+
+            if (!int.TryParse(entradas[1].Trim(), out int quantidade) || quantidade <= 0)
+                return false;
 
             DateTime agora = DateTime.Now;
             Venda venda;
+
             if (string.Equals(tipoProduto, "Livro", StringComparison.OrdinalIgnoreCase))
             {
                 Livro livro = _livroRepository.GetByTitle(titulo);
-                if (livro == null)
-                {
-                    throw new ArgumentException("Livro não encontrado.", nameof(titulo));
-                }
-                venda = new Venda(livro.Titulo, "Livro", livro.Preco, quantidade, agora.Date, agora.TimeOfDay, livro.Id);
+
+                if (livro is null)
+                    return false;
+
+                venda = new Venda(
+                    livro.Titulo, "Livro", livro.Preco, quantidade,
+                    agora.Date, agora.TimeOfDay, livro.Id);
             }
             else if (string.Equals(tipoProduto, "Filme", StringComparison.OrdinalIgnoreCase))
             {
                 Filme filme = _filmeRepository.GetByTitle(titulo);
-                if (filme == null)
-                {
-                    throw new ArgumentException("Filme não encontrado.", nameof(titulo));
-                }
-                venda = new Venda(filme.Titulo, "Filme", filme.Preco, quantidade, agora.Date, agora.TimeOfDay, filme.Id);
+
+                if (filme is null)
+                    return false;
+
+                venda = new Venda(
+                    filme.Titulo, "Filme", filme.Preco, quantidade,
+                    agora.Date, agora.TimeOfDay, filme.Id);
             }
             else
             {
-                throw new ArgumentException("Tipo de produto inválido.", nameof(tipoProduto));
+                return false;
             }
 
             return VenderProduto(venda);
@@ -138,29 +144,45 @@ namespace SistemaMonoliticoLivraria.Services
         public void ExibirVendasFilmes()
         {
             List<Venda> listaDeVendasFilmes = _vendaRepository.GetAllFilmes();
-
+            
+            Console.Clear();
+            _menu.MenuRelatorioVendasFilme();
+            
             foreach (var venda in listaDeVendasFilmes)
-            {
+            {                
                 _menu.ExibirInformacoes(venda);
             }
+            _menu.MensagemSairMenu();
+            Console.ReadKey();
         }
 
         public void ExibirVendasLivros()
         {
+            Console.Clear();
+            
+            _menu.MenuRelatorioVendasLivro();
             List<Venda> listaDeVendasLivros = _vendaRepository.GetAllLivros();
+            
             foreach (var venda in listaDeVendasLivros)
-            {
+            {                
                 _menu.ExibirInformacoes(venda);
             }
+            _menu.MensagemSairMenu();
+            Console.ReadKey();
         }
         public void ExibirRelatorioCompleto()
         {
             List<Venda> listaDeVendas = _vendaRepository.GetAllComJoin();
-        
+
+            Console.Clear();
+            _menu.MenuRelatorioVendasCompleto();
+            
             foreach (var venda in listaDeVendas)
-            {
+            {                
                 _menu.ExibirInformacoes(venda);
             }
+            _menu.MensagemSairMenu();
+            Console.ReadKey();
         }
     }
 }

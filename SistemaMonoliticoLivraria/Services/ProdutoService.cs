@@ -24,13 +24,25 @@ namespace SistemaMonoliticoLivraria.Services
         public bool CadastrarFilme(Filme filme)
         {
             ValidateProduto(filme);
-            return _filmeRepository.Insert(filme);
+            bool boolCadastro = _filmeRepository.Insert(filme);
+
+            if (boolCadastro)
+            {
+                _menu.CadastroFilmeSucesso();
+            }
+            return boolCadastro;
         }
 
         public bool CadastrarLivro(Livro livro)
         {
             ValidateProduto(livro);
-            return _livroRepository.Insert(livro);
+            bool boolCadastro = _livroRepository.Insert(livro);
+
+            if (boolCadastro)
+            {
+                _menu.CadastroLivroSucesso();
+            }
+            return boolCadastro;
         }
 
         public bool CadastrarFilmePorMenu(List<string> entradas)
@@ -39,8 +51,18 @@ namespace SistemaMonoliticoLivraria.Services
             {
                 return false;
             }
-            Filme filme = _filmeRepository.CreateFilme(entradas);
-            return CadastrarFilme(filme);
+            try
+            {
+                Filme filme = _filmeRepository.CreateFilme(entradas);
+                bool boolCadastro = CadastrarFilme(filme);
+                _menu.CadastroFilmeSucesso();
+                return boolCadastro;
+            }
+            catch
+            {
+                _menu.ErroAoCadastrarProduto();
+                return false;
+            }
         }
 
         public bool CadastrarLivroPorMenu(List<string> entradas)
@@ -49,8 +71,18 @@ namespace SistemaMonoliticoLivraria.Services
             {
                 return false;
             }
-            Livro livro = _livroRepository.CreateLivro(entradas);
-            return CadastrarLivro(livro);
+            try
+            {
+                Livro livro = _livroRepository.CreateLivro(entradas);
+                bool boolCadastro = CadastrarLivro(livro);
+                _menu.CadastroLivroSucesso();
+                return boolCadastro;
+            }
+            catch 
+            {
+                _menu.ErroAoCadastrarProduto();
+                return false;
+            }
         }
 
         public Filme BuscarFilmePorId(int filmeId)
@@ -86,30 +118,49 @@ namespace SistemaMonoliticoLivraria.Services
         public void ExibirTodosFilmes()
         {
             List<Filme> listaDeFilmes = _filmeRepository.GetAll();
+
+            _menu.TituloInformacoesFilmes();
             foreach (var filme in listaDeFilmes)
             {
                 _menu.ExibirInformacoes(filme);
             }
+            _menu.MensagemSairMenu();
         }
 
         public void ExibirTodosLivros()
         {
             List<Livro> listaDeLivros = _livroRepository.GetAll();
+            _menu.TituloInformacoesLivros();
             foreach (var livro in listaDeLivros)
             {
                 _menu.ExibirInformacoes(livro);
             }
+            _menu.MensagemSairMenu();
         }
         public void DeletarFilme(int filmeId)
         {
-            ValidateId(filmeId);
-            _filmeRepository.Delete(filmeId);
+            if (VerifyIdFilmeExist(filmeId))
+            {
+                _filmeRepository.Delete(filmeId);
+                _menu.ConfirmacaoExcluirFilme();
+            }
+            else
+            {
+                _menu.IdNaoEncontrado();
+            }
         }
 
         public void DeletarLivro(int livroId)
         {
-            ValidateId(livroId);
-            _livroRepository.Delete(livroId);
+            if (VerifyIdLivroExist(livroId))
+            {
+                _livroRepository.Delete(livroId);
+                _menu.ConfirmacaoExcluirLivro();
+            }
+            else
+            {
+                _menu.IdNaoEncontrado();
+            }
         }
         public bool AtualizarFilme(Filme filme)
         {
@@ -180,9 +231,8 @@ namespace SistemaMonoliticoLivraria.Services
             }
         }
 
-        public void VerifyIdFilmeExist(int id)
+        public bool VerifyIdFilmeExist(int id)
         {
-            bool produtoExist = false;
             ValidateId(id);
 
             List<Filme> listaDeFilmes = _filmeRepository.GetAll();
@@ -190,32 +240,28 @@ namespace SistemaMonoliticoLivraria.Services
             {
                 if (filme.Id == id)
                 {
-                    produtoExist = true;
+                    return true;
                 }
             }
-            if (!produtoExist)
-            {
-                throw new ArgumentException("Id não encontrado.", nameof(id));
-            }
+            
+            return false;
         }
 
-        public void VerifyIdLivroExist(int id)
+        public bool VerifyIdLivroExist(int id)
         {
-            bool produtoExist = false;
             ValidateId(id);
 
             List<Livro> listaDeLivros = _livroRepository.GetAll();
+
             foreach (Livro livro in listaDeLivros)
             {
                 if (livro.Id == id)
                 {
-                    produtoExist = true;
+                    return true;
                 }
             }
-            if (!produtoExist)
-            {
-                throw new ArgumentException("Id não encontrado.", nameof(id));
-            }
+
+            return false;
         }
 
         private bool ValidateStringNotEmpty(string texto)

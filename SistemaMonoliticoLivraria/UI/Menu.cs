@@ -121,11 +121,31 @@ namespace SistemaMonoliticoLivraria.UI
             entradas.Add(LerCampo("Digite o preço do livro"));            
             entradas.Add(LerCampo("Digite a quantidade em estoque do livro"));
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("= Digite 0 para voltar                                          =");
+            Console.WriteLine("= Digite 0 para voltar                                        =");
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("===============================================================");
 
             return PreValidationEntradas(entradas);
+        }
+
+        public void CadastroFilmeSucesso()
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.DarkGreen;
+            Console.WriteLine("===============================================================");
+            Console.WriteLine("= Livro cadastrado com sucesso!                               =");
+            Console.WriteLine("===============================================================");
+            MensagemSairMenu();
+        }
+
+        public void CadastroLivroSucesso()
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.DarkGreen;
+            Console.WriteLine("===============================================================");
+            Console.WriteLine("= Filme cadastrado com sucesso!                               =");
+            Console.WriteLine("===============================================================");
+            MensagemSairMenu();
         }
         
         public string MenuRealizarVenda()
@@ -136,8 +156,8 @@ namespace SistemaMonoliticoLivraria.UI
             Console.WriteLine("=                   Realizar Venda                            =");
             Console.WriteLine("===============================================================");
             Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine("= 1 - Realizar Venda de Livro                                 =");
-            Console.WriteLine("= 2 - Realizar Venda de Filme                                 =");
+            Console.WriteLine("= 1 - Realizar Venda de Filme                                 =");
+            Console.WriteLine("= 2 - Realizar Venda de livro                                 =");
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("= 0 - Voltar                                                  =");
             Console.ForegroundColor = ConsoleColor.White;
@@ -187,6 +207,16 @@ namespace SistemaMonoliticoLivraria.UI
             return PreValidationEntradas(entradas);
 
         }
+        public void VendaRealizadaSucesso()
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.DarkGreen;
+            Console.WriteLine("===============================================================");
+            Console.WriteLine("= Venda realizada com sucesso!                                =");
+            Console.WriteLine("===============================================================");
+            Console.ResetColor();
+            MensagemSairMenu();
+        }
         public string MenuConsultarProduto()
         {
             Console.Clear();
@@ -208,18 +238,42 @@ namespace SistemaMonoliticoLivraria.UI
             return idTexto;
         }
 
-        public string MenuConsultarProdutoFilme()
+        private void TituloConsultarFilme()
         {
-            Console.Clear();
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("===============================================================");
             Console.WriteLine("=                    Consultar Filme                          =");
             Console.WriteLine("===============================================================");
+        }
+
+        public void ExibirFilme()
+        {
+            Console.Clear();
+            TituloConsultarFilme();
+        }
+        private void TituloConsultarLivro()
+        {
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("===============================================================");
+            Console.WriteLine("=                    Consultar Livro                          =");
+            Console.WriteLine("===============================================================");
+        }
+
+        public void ExibirLivro()
+        {
+            Console.Clear();
+            TituloConsultarLivro();
+        }
+
+        public string MenuConsultarProdutoFilme()
+        {
+            Console.Clear();
+            TituloConsultarFilme();
             Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine("= 1 - Consultar por Id                                         =");
-            Console.WriteLine("= 2 - Consultar por título                                     =");
+            Console.WriteLine("= 1 - Consultar por Id                                        =");
+            Console.WriteLine("= 2 - Consultar por título                                    =");
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("= 0 - Voltar                                                   =");
+            Console.WriteLine("= 0 - Voltar                                                  =");
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("===============================================================");
             string idTexto = LerCampo("Digite a opção desejada");
@@ -232,14 +286,11 @@ namespace SistemaMonoliticoLivraria.UI
         public string MenuConsultarProdutoFilmePorId()
         {
             Console.Clear();
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("===============================================================");
-            Console.WriteLine("=                    Consultar Filme                          =");
-            Console.WriteLine("===============================================================");
+            TituloConsultarFilme();
             Console.ForegroundColor = ConsoleColor.White;
             string idTexto = LerCampo("Digite o Id do filme");            
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("= Digite enter para voltar.                                       =");
+            Console.WriteLine("= Digite enter para voltar.                                   =");
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("===============================================================");
             Console.ResetColor();
@@ -251,13 +302,11 @@ namespace SistemaMonoliticoLivraria.UI
         {
             Console.Clear();
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("===============================================================");
-            Console.WriteLine("=                    Consultar Filme                          =");
-            Console.WriteLine("===============================================================");
+            TituloConsultarFilme();
             Console.ForegroundColor = ConsoleColor.White;
             string idTexto = LerCampo("Digite o titulo do filme");
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("= Digite enter para voltar.                                       =");
+            Console.WriteLine("= Digite enter para voltar.                                   =");
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("===============================================================");
             Console.ResetColor();
@@ -268,10 +317,7 @@ namespace SistemaMonoliticoLivraria.UI
         public string MenuConsultarProdutoLivro()
         {
             Console.Clear();
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("===============================================================");
-            Console.WriteLine("=                    Consultar Livro                          =");
-            Console.WriteLine("===============================================================");
+            TituloConsultarLivro();
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("= 1 - Consultar por Id                                         =");
             Console.WriteLine("= 2 - Consultar por título                                     =");
@@ -289,14 +335,11 @@ namespace SistemaMonoliticoLivraria.UI
         public string MenuConsultarProdutoLivroPorId()
         {
             Console.Clear();
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("===============================================================");
-            Console.WriteLine("=                    Consultar Livro                          =");
-            Console.WriteLine("===============================================================");
+            TituloConsultarLivro();
             Console.ForegroundColor = ConsoleColor.White;
             string idTexto = LerCampo("Digite o Id do livro");
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("= Digite enter para voltar.                                       =");
+            Console.WriteLine("= Digite enter para voltar.                                   =");
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("===============================================================");
             Console.ResetColor();
@@ -308,13 +351,11 @@ namespace SistemaMonoliticoLivraria.UI
         {
             Console.Clear();
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("===============================================================");
-            Console.WriteLine("=                    Consultar Livro                          =");
-            Console.WriteLine("===============================================================");
+            TituloConsultarLivro();
             Console.ForegroundColor = ConsoleColor.White;
             string idTexto = LerCampo("Digite o titulo do livro");
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("= Digite enter para voltar.                                       =");
+            Console.WriteLine("= Digite enter para voltar.                                   =");
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("===============================================================");
             Console.ResetColor();
@@ -378,20 +419,24 @@ namespace SistemaMonoliticoLivraria.UI
 
         public void ConfirmacaoExcluirLivro()
         {
+            Console.Clear();
             Console.ForegroundColor = ConsoleColor.DarkGreen;
             Console.WriteLine("===============================================================");
             Console.WriteLine("Livro excluido com sucesso!");
             Console.WriteLine("===============================================================");
             Console.ResetColor();
+            MensagemSairMenu();
         }
 
         public void ConfirmacaoExcluirFilme()
         {
+            Console.Clear();
             Console.ForegroundColor = ConsoleColor.DarkGreen;
             Console.WriteLine("===============================================================");
             Console.WriteLine("Filme excluido com sucesso!");
             Console.WriteLine("===============================================================");
             Console.ResetColor();
+            MensagemSairMenu();
         }
 
         public string MenuGerenciarEstoque()
@@ -402,9 +447,9 @@ namespace SistemaMonoliticoLivraria.UI
             Console.WriteLine("=                   Gerenciar Estoque                         =");
             Console.WriteLine("===============================================================");
             Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine("= 1 - Imprimir Estoque                                        =");
-            Console.WriteLine("= 2 - Atualizar Estoque                                       =");
-            Console.WriteLine("= 3 - Exibir Estoque                                          =");
+            Console.WriteLine("= 1 - Atualizar Estoque                                       =");
+            Console.WriteLine("= 2 - Exibir Estoque (Filme ou Livro)                         =");
+            Console.WriteLine("= 3 - Exibir Estoque Completo                                 =");
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("= 0 - Voltar                                                  =");
             Console.ForegroundColor = ConsoleColor.White;
@@ -482,11 +527,13 @@ namespace SistemaMonoliticoLivraria.UI
 
         public void ConfirmacaoAtualizacaoEstoque()
         {
+            Console.Clear();
             Console.ForegroundColor = ConsoleColor.DarkGreen;
             Console.WriteLine("===============================================================");
             Console.WriteLine("Estoque atualizado com sucesso!");
             Console.WriteLine("===============================================================");
             Console.ResetColor();
+            MensagemSairMenu();
         }
 
         public string MenuExibirEstoque()
@@ -511,6 +558,7 @@ namespace SistemaMonoliticoLivraria.UI
 
         public void TituloInformacoesFilmes()
         {
+            Console.Clear();
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("===============================================================");
             Console.WriteLine("=                    Estoque de Filmes                        =");
@@ -520,6 +568,7 @@ namespace SistemaMonoliticoLivraria.UI
 
         public void TituloInformacoesLivros()
         {
+            Console.Clear();
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("===============================================================");
             Console.WriteLine("=                     Estoque de Livros                       =");
@@ -570,7 +619,31 @@ namespace SistemaMonoliticoLivraria.UI
 
             return idTexto;
         }            
-        
+
+        public void MenuRelatorioVendasFilme()
+        {
+            Console.Clear();
+            Console.WriteLine("===============================================================");
+            Console.WriteLine("=               Relatório de Vendas (Filmes)                  =");
+            Console.WriteLine("===============================================================");
+        }
+
+        public void MenuRelatorioVendasLivro()
+        {
+            Console.Clear();
+            Console.WriteLine("===============================================================");
+            Console.WriteLine("=               Relatório de Vendas (Livros)                  =");
+            Console.WriteLine("===============================================================");
+        }
+
+        public void MenuRelatorioVendasCompleto()
+        {
+            Console.Clear();
+            Console.WriteLine("===============================================================");
+            Console.WriteLine("=              Relatório de Vendas (Completo)                 =");
+            Console.WriteLine("===============================================================");
+        }
+
         public void ExibirInformacoes(Venda venda)
         {
             Console.ForegroundColor = ConsoleColor.White;
@@ -588,21 +661,57 @@ namespace SistemaMonoliticoLivraria.UI
 
         public void MensagemOpcaoInvalida()
         {
+            Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("Opção inválida. Pressione qualquer tecla para continuar...");
             Console.ReadKey();
         }
 
+        public void EstoqueInsuficiente()
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("Estoque insuficiente.");
+        }
+
+        public void ErroVenda()
+        {
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("Erro ao realizar venda.");
+            Console.ReadLine();
+        }
+
         public void MensagemSairMenu()
         {
+            Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("Pressione qualquer tecla pra sair...");
             Console.ReadKey();
         }
 
         public void MensagemProdutoNaoEncontrado()
         {
+            Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("Produto não encontrado. Pressione qualquer tecla para continuar...");
             Console.ReadKey();
         }
+        
+        public void ErroAoCadastrarProduto()
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine("===============================================================");
+            Console.WriteLine("= Erro ao cadastrar produto.                                  =");
+            Console.WriteLine("===============================================================");
+        }
 
+        public void IdNaoEncontrado()
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine("===============================================================");
+            Console.WriteLine("= Não há produto com esse id                                  =");
+            Console.WriteLine("===============================================================");
+            Console.ResetColor();
+            MensagemSairMenu();
+        }
     }
 }

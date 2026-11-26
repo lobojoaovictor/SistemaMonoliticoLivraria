@@ -64,284 +64,214 @@ namespace SistemaMonoliticoLivraria
 
         private static void CadastrarProduto(ProdutoService produtoService, Menu menu)
         {
-            int opcaoCadastro = produtoService.ConvertStringForInt(menu.MenuCadastrarProduto());
+            int opcaoCadastro;
+            do
+            {
+                opcaoCadastro = produtoService.ConvertStringForInt(menu.MenuCadastrarProduto());
 
-            if (opcaoCadastro == 0)
-            {
-                menu.MensagemSairMenu();
-            }
-            else if (opcaoCadastro == 1)
-            {
-                produtoService.CadastrarFilmePorMenu(menu.MenuCadastrarProdutoFilme());
-            }
-            else if (opcaoCadastro == 2)
-            {
-                produtoService.CadastrarLivroPorMenu(menu.MenuCadastrarProdutoLivro());
-            }
-            else
-            {
-                menu.MensagemOpcaoInvalida();
-            }
+                if (opcaoCadastro == 1)
+                    produtoService.CadastrarFilmePorMenu(menu.MenuCadastrarProdutoFilme());
+                else if (opcaoCadastro == 2)
+                    produtoService.CadastrarLivroPorMenu(menu.MenuCadastrarProdutoLivro());
+                else if (opcaoCadastro != 0)
+                    menu.MensagemOpcaoInvalida();
+            } while (opcaoCadastro != 0);
         }
 
         private static void RealizarVenda(ProdutoService produtoService, VendaService vendaService, Menu menu)
         {
-            int opcaoVenda = produtoService.ConvertStringForInt(menu.MenuRealizarVenda());
+            int opcaoVenda;
+            do
+            {
+                opcaoVenda = produtoService.ConvertStringForInt(menu.MenuRealizarVenda());
 
-            if (opcaoVenda == 0)
-            {
-                menu.MensagemSairMenu();
-            }
-            else if (opcaoVenda == 1)
-            {
-                List<string> entradas = menu.MenuRealizarVendaLivro();
-                if (entradas.Count > 0)
+                if (opcaoVenda == 1)
                 {
-                    vendaService.VenderPorMenu(entradas, "Livro");
+                    List<string> entradas = menu.MenuRealizarVendaFilme();
+                    if (entradas.Count > 0)
+                        vendaService.VenderPorMenu(entradas, "Filme");
                 }
-            }
-            else if (opcaoVenda == 2)
-            {
-                List<string> entradas = menu.MenuRealizarVendaFilme();
-                if (entradas.Count > 0)
+                else if (opcaoVenda == 2)
                 {
-                    vendaService.VenderPorMenu(entradas, "Filme");
+                    List<string> entradas = menu.MenuRealizarVendaLivro();
+                    if (entradas.Count > 0)
+                        vendaService.VenderPorMenu(entradas, "Livro");                    
                 }
-            }
-            else
-            {
-                menu.MensagemOpcaoInvalida();
-            }
+                else if (opcaoVenda != 0)
+                    menu.MensagemOpcaoInvalida();
+            } while (opcaoVenda != 0);
         }
 
         private static void ConsultarProduto(ProdutoService produtoService, Menu menu)
         {
-            int opcaoConsulta = produtoService.ConvertStringForInt(menu.MenuConsultarProduto());
-
-            if (opcaoConsulta == 0)
+            int opcaoConsulta;
+            do
             {
-                menu.MensagemSairMenu();
-            }
-            else if (opcaoConsulta == 1)
-            {
-                int opcaoConsultaFilme = produtoService.ConvertStringForInt(menu.MenuConsultarProdutoFilme());
+                opcaoConsulta = produtoService.ConvertStringForInt(menu.MenuConsultarProduto());
 
-                if (opcaoConsultaFilme == 0)
+                if (opcaoConsulta == 1)
                 {
-                    menu.MensagemSairMenu();
+                    int opcaoFilme;
+                    do
+                    {
+                        opcaoFilme = produtoService.ConvertStringForInt(menu.MenuConsultarProdutoFilme());
+                        if (opcaoFilme == 1)
+                        {
+                            string texto = menu.MenuConsultarProdutoFilmePorId();
+                            if (produtoService.VerifyStringNotEmpity(texto))
+                            {
+                                menu.ExibirFilme();
+                                ExibirFilmeOuMensagem(produtoService.BuscarFilmePorId(produtoService.ConvertStringForInt(texto)), menu);
+                                menu.MensagemSairMenu();
+                            }
+                        }
+                        else if (opcaoFilme == 2)
+                        {
+                            string texto = menu.MenuConsultarProdutoFilmePorTitulo();
+                            if (produtoService.VerifyStringNotEmpity(texto))
+                            {
+                                menu.ExibirFilme();
+                                ExibirFilmeOuMensagem(produtoService.BuscarFilmePorTitulo(texto), menu);
+                                menu.MensagemSairMenu();
+                            }
+                        }
+                        else if (opcaoFilme != 0)
+                            menu.MensagemOpcaoInvalida();
+                    } while (opcaoFilme != 0);
                 }
-                else if (opcaoConsultaFilme == 1)
+                else if (opcaoConsulta == 2)
                 {
-                    string texto = menu.MenuConsultarProdutoFilmePorId();
-                    if (!produtoService.VerifyStringNotEmpity(texto))
+                    int opcaoLivro;
+                    do
                     {
-                        menu.MensagemSairMenu();
-                    }
-                    else
-                    {
-                        Filme filme = produtoService.BuscarFilmePorId(produtoService.ConvertStringForInt(texto));
-                        ExibirFilmeOuMensagem(filme, menu);
-                    }
+                        opcaoLivro = produtoService.ConvertStringForInt(menu.MenuConsultarProdutoLivro());
+                        if (opcaoLivro == 1)
+                        {
+                            string texto = menu.MenuConsultarProdutoLivroPorId();
+                            if (produtoService.VerifyStringNotEmpity(texto))
+                            {
+                                menu.ExibirLivro();
+                                ExibirLivroOuMensagem(produtoService.BuscarLivroPorId(produtoService.ConvertStringForInt(texto)), menu);
+                                menu.MensagemSairMenu();
+                            }
+                        }
+                        else if (opcaoLivro == 2)
+                        {
+                            string texto = menu.MenuConsultarProdutoLivroPorTitulo();
+                            if (produtoService.VerifyStringNotEmpity(texto))
+                            {
+                                menu.ExibirLivro();
+                                ExibirLivroOuMensagem(produtoService.BuscarLivroPorTitulo(texto), menu);
+                                menu.MensagemSairMenu();
+                            }
+                        }
+                        else if (opcaoLivro != 0)
+                            menu.MensagemOpcaoInvalida();
+                    } while (opcaoLivro != 0);
                 }
-                else if (opcaoConsultaFilme == 2)
-                {
-                    string texto = menu.MenuConsultarProdutoFilmePorTitulo();
-                    if (!produtoService.VerifyStringNotEmpity(texto))
-                    {
-                        menu.MensagemSairMenu();
-                    }
-                    else
-                    {
-                        Filme filme = produtoService.BuscarFilmePorTitulo(texto);
-                        ExibirFilmeOuMensagem(filme, menu);
-                    }
-                }
-                else
-                {
+                else if (opcaoConsulta != 0)
                     menu.MensagemOpcaoInvalida();
-                }
-            }
-            else if (opcaoConsulta == 2)
-            {
-                int opcaoConsultaLivro = produtoService.ConvertStringForInt(menu.MenuConsultarProdutoLivro());
-
-                if (opcaoConsultaLivro == 0)
-                {
-                    menu.MensagemSairMenu();
-                }
-                else if (opcaoConsultaLivro == 1)
-                {
-                    string texto = menu.MenuConsultarProdutoLivroPorId();
-                    if (!produtoService.VerifyStringNotEmpity(texto))
-                    {
-                        menu.MensagemSairMenu();
-                    }
-                    else
-                    {
-                        Livro livro = produtoService.BuscarLivroPorId(produtoService.ConvertStringForInt(texto));
-                        ExibirLivroOuMensagem(livro, menu);
-                    }
-
-                }
-                else if (opcaoConsultaLivro == 2)
-                {
-                    string texto = menu.MenuConsultarProdutoLivroPorTitulo();
-                    if (!produtoService.VerifyStringNotEmpity(texto))
-                    {
-                        menu.MensagemSairMenu();
-                    }
-                    else
-                    {
-                        Livro livro = produtoService.BuscarLivroPorTitulo(texto);
-                        ExibirLivroOuMensagem(livro, menu);
-                    }
-                }
-                else
-                {
-                    menu.MensagemOpcaoInvalida();
-                }
-            }
-            else
-            {
-                menu.MensagemOpcaoInvalida();
-            }
+            } while (opcaoConsulta != 0);
 
         }
 
         private static void ExcluirProduto(ProdutoService produtoService, Menu menu)
         {
-            int opcaoExclusao = produtoService.ConvertStringForInt(menu.MenuExcluirProduto());
+            int opcaoExclusao;
+            do
+            {
+                opcaoExclusao = produtoService.ConvertStringForInt(menu.MenuExcluirProduto());
 
-            if (opcaoExclusao == 0)
-            {
-                menu.MensagemSairMenu();
-            }
-            else if (opcaoExclusao == 1)
-            {
-                int idProduto = produtoService.ConvertStringForInt(menu.MenuExcluirFilme());
-                produtoService.VerifyIdFilmeExist(idProduto);
-                produtoService.DeletarFilme(idProduto);
-                menu.ConfirmacaoExcluirFilme();                
-            }
-            else if (opcaoExclusao == 2)
-            {
-                int idProduto = produtoService.ConvertStringForInt(menu.MenuExcluirLivro());
-                produtoService.VerifyIdLivroExist(idProduto);
-                produtoService.DeletarLivro(idProduto);
-                menu.ConfirmacaoExcluirLivro();
-            }
-            else
-            {
-                menu.MensagemOpcaoInvalida();
-            }
+                if (opcaoExclusao == 1)
+                {
+                    int idProduto = produtoService.ConvertStringForInt(menu.MenuExcluirFilme());
+                    produtoService.VerifyIdFilmeExist(idProduto);
+                    produtoService.DeletarFilme(idProduto);
+                }
+                else if (opcaoExclusao == 2)
+                {
+                    int idProduto = produtoService.ConvertStringForInt(menu.MenuExcluirLivro());
+                    produtoService.VerifyIdLivroExist(idProduto);
+                    produtoService.DeletarLivro(idProduto);
+                }
+                else if (opcaoExclusao != 0)
+                    menu.MensagemOpcaoInvalida();
+            } while (opcaoExclusao != 0);
         }
 
         private static void GerenciarEstoque(ProdutoService produtoService, Menu menu)
         {
-            int opcaoEstoque = produtoService.ConvertStringForInt(menu.MenuGerenciarEstoque());
-
-            if (opcaoEstoque == 1)
+            int opcaoEstoque;
+            do
             {
-                produtoService.ExibirTodosFilmes();
-                produtoService.ExibirTodosLivros();
-            }
-            else if (opcaoEstoque == 2)
-            {
-                int opcaoAdicionarEstoque = produtoService.ConvertStringForInt(menu.MenuAdicionarEstoque());
+                opcaoEstoque = produtoService.ConvertStringForInt(menu.MenuGerenciarEstoque());
 
-                if (opcaoAdicionarEstoque == 0)
+                if (opcaoEstoque == 1)
                 {
-                    menu.MensagemSairMenu();
-                }
-                else if (opcaoAdicionarEstoque == 1)
-                {
-                    List<string> entradas = menu.MenuAdicionarEstoqueFilme();
-                    if (entradas.Count == 0)
+                    int opcaoAdicionar;
+                    do
                     {
-                        return;
-                    }
-                    int idFilme = produtoService.ConvertStringForInt(entradas[0]);
-                    int estoqueAtual = produtoService.ConvertStringForInt(entradas[1]);
-                    if (produtoService.SetStockFilme(idFilme, estoqueAtual))
-                    {
-                        menu.ConfirmacaoAtualizacaoEstoque();
-                    }
-
+                        opcaoAdicionar = produtoService.ConvertStringForInt(menu.MenuAdicionarEstoque());
+                        if (opcaoAdicionar == 1)
+                        {
+                            List<string> entradas = menu.MenuAdicionarEstoqueFilme();
+                            if (entradas.Count > 0 && produtoService.SetStockFilme(
+                                produtoService.ConvertStringForInt(entradas[0]),
+                                produtoService.ConvertStringForInt(entradas[1])))
+                                menu.ConfirmacaoAtualizacaoEstoque();
+                        }
+                        else if (opcaoAdicionar == 2)
+                        {
+                            List<string> entradas = menu.MenuAdicionarEstoqueLivro();
+                            if (entradas.Count > 0 && produtoService.SetStockLivro(
+                                produtoService.ConvertStringForInt(entradas[0]),
+                                produtoService.ConvertStringForInt(entradas[1])))
+                                menu.ConfirmacaoAtualizacaoEstoque();
+                        }
+                        else if (opcaoAdicionar != 0)
+                            menu.MensagemOpcaoInvalida();
+                    } while (opcaoAdicionar != 0);
                 }
-                else if (opcaoAdicionarEstoque == 2)
+                else if (opcaoEstoque == 2)
                 {
-                    List<string> entradas = menu.MenuAdicionarEstoqueLivro();
-                    if (entradas.Count == 0)
+                    int opcaoExibir;
+                    do
                     {
-                        return;
-                    }
-                    int idLivro = produtoService.ConvertStringForInt(entradas[0]);
-                    int estoqueAtual = produtoService.ConvertStringForInt(entradas[1]);
-                    if (produtoService.SetStockLivro(idLivro, estoqueAtual))
-                    {
-                        menu.ConfirmacaoAtualizacaoEstoque();
-                    }
-
+                        opcaoExibir = produtoService.ConvertStringForInt(menu.MenuExibirEstoque());
+                        if (opcaoExibir == 1)
+                            produtoService.ExibirTodosFilmes();
+                        else if (opcaoExibir == 2)
+                            produtoService.ExibirTodosLivros();
+                        else if (opcaoExibir != 0)
+                            menu.MensagemOpcaoInvalida();
+                    } while (opcaoExibir != 0);
                 }
-                else
-                {
-                    menu.MensagemOpcaoInvalida();
-                }
-
-            }
-            else if (opcaoEstoque == 3)
-            {
-                int escolhaMenuExibirEstoque = produtoService.ConvertStringForInt(menu.MenuExibirEstoque());
-
-                if (escolhaMenuExibirEstoque == 0)
-                {
-                    menu.MensagemSairMenu();
-                }
-
-                else if (escolhaMenuExibirEstoque == 1)
+                else if (opcaoEstoque == 3)
                 {
                     produtoService.ExibirTodosFilmes();
-                }
-                else if (escolhaMenuExibirEstoque == 2)
-                {
                     produtoService.ExibirTodosLivros();
                 }
-                else
-                {
+                else if (opcaoEstoque != 0)
                     menu.MensagemOpcaoInvalida();
-                }
-
-            }
-            else
-            {
-                menu.MensagemOpcaoInvalida();
-            }
+            } while (opcaoEstoque != 0);
         }
 
         private static void ImprimirRelatorioDeVendas(VendaService vendaService, ProdutoService produtoService, Menu menu)
         {
-            int opcaoRelatorio = produtoService.ConvertStringForInt(menu.MenuRelatorioVendas());
+            int opcaoRelatorio;
+            do
+            {
+                opcaoRelatorio = produtoService.ConvertStringForInt(menu.MenuRelatorioVendas());
 
-            if (opcaoRelatorio == 0)
-            {
-                menu.MensagemSairMenu();
-            }
-            else if (opcaoRelatorio == 1)
-            {
-                vendaService.ExibirVendasFilmes();
-            }
-            else if (opcaoRelatorio == 2)
-            {
-                vendaService.ExibirVendasLivros();
-            }
-            else if (opcaoRelatorio == 3)
-            {
-                vendaService.ExibirRelatorioCompleto();
-            }
-            else
-            {
-                menu.MensagemOpcaoInvalida();
-            }
+                if (opcaoRelatorio == 1)
+                    vendaService.ExibirVendasFilmes();
+                else if (opcaoRelatorio == 2)
+                    vendaService.ExibirVendasLivros();
+                else if (opcaoRelatorio == 3)
+                    vendaService.ExibirRelatorioCompleto();
+                else if (opcaoRelatorio != 0)
+                    menu.MensagemOpcaoInvalida();
+            } while (opcaoRelatorio != 0);
 
         }
 
