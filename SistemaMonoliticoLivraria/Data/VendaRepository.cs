@@ -218,6 +218,67 @@ namespace SistemaMonoliticoLivraria.Data
             }
         }
 
+        public List<Venda> GetAllComJoin()
+{
+    const string sql = @"
+        SELECT
+            v.Id,
+            COALESCE(l.Titulo, f.Titulo, v.Produto) AS Produto,
+            v.TipoProduto,
+            v.Preco,
+            v.QuantidadeVendida,
+            v.TotalVenda,
+            v.DataVenda,
+            v.HoraVenda,
+            v.IdProduto
+        FROM vendas v
+        LEFT JOIN livros l
+            ON v.IdProduto = l.Id
+            AND v.TipoProduto = 'Livro'
+        LEFT JOIN filmes f
+            ON v.IdProduto = f.Id
+            AND v.TipoProduto = 'Filme'
+        ORDER BY v.DataVenda DESC, v.HoraVenda DESC;";
+
+    using (MySqlConnection conexao = _database.ConexaoLocadora())
+    {
+        MySqlCommand comando = new MySqlCommand(sql, conexao);
+
+        using (MySqlDataReader reader = comando.ExecuteReader())
+        {
+            List<Venda> vendas = new List<Venda>();
+
+            while (reader.Read())
+            {
+                int id = reader.GetInt32("Id");
+                string produto = reader.GetString("Produto");
+                string tipoProduto = reader.GetString("TipoProduto");
+                decimal preco = reader.GetDecimal("Preco");
+                int quantidadeVendida = reader.GetInt32("QuantidadeVendida");
+                decimal totalVenda = reader.GetDecimal("TotalVenda");
+                DateTime dataVenda = reader.GetDateTime("DataVenda");
+                TimeSpan horaVenda = reader.GetTimeSpan("HoraVenda");
+                int idProduto = reader.GetInt32("IdProduto");
+
+                Venda venda = new Venda(
+                    id,
+                    produto,
+                    tipoProduto,
+                    preco,
+                    quantidadeVendida,
+                    totalVenda,
+                    dataVenda,
+                    horaVenda,
+                    idProduto);
+
+                vendas.Add(venda);
+            }
+
+            return vendas;
+        }
+    }
+}
+
 
     }
 }
